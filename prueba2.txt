@@ -1,3 +1,7 @@
-PUT "Ingrese un valor entero para actual: ";
 PUT "Prueba.txt LyC Tema 2!";
-
+PUT "Ingrese un valor entero para actual: ";
+GET actual;
+contador: 0;
+suma: 02.5+0xA2B0;
+PUT "La suma es: ";
+PUT suma;

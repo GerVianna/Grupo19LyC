@@ -60,26 +60,26 @@ PYC     ";"
 {ELSE}     printf ("\n Sentencia ELSE: %s\n",yytext);
 {WHILE}    printf ("\n Sentencia WHILE: %s\n",yytext);
 {PUT} {printf("\n PUT: %s \n", yytext); return PUT;}
-{GET} {printf("\n GET: %s \n", yytext);}
-{CTE} printf("\n Constante: %s\n", yytext);
-{CTE_HEXA} printf("\n Constante hexa: %s\n", yytext);
+{GET} {printf("\n GET: %s \n", yytext); return GET;}
+{CTE} {printf("\n Constante: %s\n", yytext); return CTE;}
+{CTE_HEXA} {printf("\n Constante hexa: %s\n", yytext); return CTE_HEXA;}
 {CTE_BIN} printf("\n Constante binaria: %s\n", yytext);
-{CTE_REAL} printf ("\n Constante real: %s\n",yytext);
+{CTE_REAL} {printf ("\n Constante real: %s\n",yytext); return CTE_REAL;}
 {STRING} {printf("\n STRING: %s \n", yytext); return STRING;}
-{ID} {printf("\n ID: %s \n", yytext); }
-{OP_ASIG} printf("\n Asignacion: %s\n", yytext);
-{OP_SUM} printf("\n Suma: %s\n", yytext);
-{OP_DIV} printf("\n Division: %s\n", yytext);
-{OP_MUL} printf("\n Multiplicacion: %s\n", yytext);
-{OP_RES}   printf ("\n Resta: %s\n",yytext);
+{ID} {printf("\n ID: %s \n", yytext); return ID;}
+{OP_ASIG} {printf("\n Asignacion: %s\n", yytext); return OP_ASIG;}
+{OP_SUM} {printf("\n Suma: %s\n", yytext); return OP_SUM;}
+{OP_DIV} {printf("\n Division: %s\n", yytext); return OP_DIV;}
+{OP_MUL} {printf("\n Multiplicacion: %s\n", yytext); return OP_MUL;}
+{OP_RES}   {printf ("\n Resta: %s\n",yytext); return OP_RES;}
 {OP_DIST}  printf ("\n Distinto: %s\n",yytext);
 {OP_IGUAL}    printf ("\n Igual: %s\n",yytext);
 {MENOR} printf("\n Menor: %s\n", yytext);
 {MAYOR} printf("\n Mayor: %s\n", yytext);
 {MENORIGUAL} printf("\n Menor o igual: %s\n", yytext);
 {MAYORIGUAL} printf("\n Mayor o igual: %s\n", yytext);
-{P_A}      printf ("\nP_A: %s\n",yytext);
-{P_C}      printf ("\nP_C: %s\n",yytext);
+{P_A}      {printf ("\nP_A: %s\n",yytext); return P_A;}
+{P_C}      {printf ("\nP_C: %s\n",yytext); return P_C;}
 {L_A}      printf ("\nL_A: %s\n",yytext);
 {L_C}      printf ("\nL_C: %s\n",yytext);
 {PYC} {printf("\n PyC: %s \n", yytext); return PYC; }

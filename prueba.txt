@@ -1,5 +1,5 @@
-PUT "Prueba.txt LyC Tema 2!";
-PUT "Ingrese un valor entero para actual: ";
+READY -> PUT "Prueba.txt LyC Tema 2!";
+READY -> PUT "Ingrese un valor entero para actual: ";
 GET actual;
 contador: 0;
 suma: 02.5+0xA2B0;
@@ -9,8 +9,8 @@ actual: (contador/0.342) + (contador* maximo (actual*contador, 2,
 actual*pivot,maximo (4,actual,0b110) ) );
 suma: suma + actual;
 }
-PUT "La suma es: ";
-PUT suma;
+READY -> PUT "La suma es: "; 
+READY -> PUT suma;
 if (actual > 0b10 and actual <> 0){
 PUT "actual es mayor que 2 y distinto de cero";
 }

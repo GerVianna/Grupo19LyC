@@ -11,16 +11,35 @@ FILE *yyin;
 %}
 
 %token PUT
-%token STRING
 %token PYC
-
-
-
+%token GET
+%token ID
+%token STRING CTE CTE_HEXA CTE_REAL
+%token OP_ASIG OP_SUM OP_RES OP_MUL OP_DIV P_A P_C
 
 %%
 
-put:
-    PUT STRING PYC{ printf("\n retorne put -> PUT STRING PYC\n");};
+programa			:			program {printf("Compilacion OK\n");}
+program				:			sentencia | program sentencia;
+sentencia			: 		    put | get | asignacion;
+
+put                 :           PUT factor PYC { printf("\n retorne put -> PUT STRING PYC\n\n");};
+get                 :           GET ID PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
+asignacion          :           ID OP_ASIG exp PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
+
+exp:
+	term {printf("regla exp es termino\n "); }
+	|exp OP_SUM term { printf("regla exp es suma\n ");}
+	| exp OP_RES term
+
+	;
+term:
+	term OP_MUL factor
+	|term OP_DIV factor
+	| factor { printf("regla termino es factor\n ");}
+	;
+
+factor: CTE | ID | STRING | CTE_HEXA | CTE_REAL { printf("\n retorne get ->GET STRING PYC\n\n");};
 
 %%
 
