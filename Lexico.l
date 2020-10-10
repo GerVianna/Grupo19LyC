@@ -21,7 +21,8 @@ IF  if
 ELSE    else
 WHILE   while
 INTEGER Integer 
-FLOAT Float 
+FLOAT Float
+MAXIMO maximo 
 
 
 
@@ -59,11 +60,12 @@ PYC     ";"
 {IF}       printf ("\n Sentencia IF: %s\n",yytext);
 {ELSE}     printf ("\n Sentencia ELSE: %s\n",yytext);
 {WHILE}    printf ("\n Sentencia WHILE: %s\n",yytext);
+{MAXIMO}   {printf("\n Maximo: %s \n", yytext); return MAXIMO;} 
 {PUT} {printf("\n PUT: %s \n", yytext); return PUT;}
 {GET} {printf("\n GET: %s \n", yytext); return GET;}
 {CTE} {printf("\n Constante: %s\n", yytext); return CTE;}
 {CTE_HEXA} {printf("\n Constante hexa: %s\n", yytext); return CTE_HEXA;}
-{CTE_BIN} printf("\n Constante binaria: %s\n", yytext);
+{CTE_BIN} {printf("\n Constante binaria: %s\n", yytext); return CTE_BIN;}
 {CTE_REAL} {printf ("\n Constante real: %s\n",yytext); return CTE_REAL;}
 {STRING} {printf("\n STRING: %s \n", yytext); return STRING;}
 {ID} {printf("\n ID: %s \n", yytext); return ID;}
@@ -83,7 +85,7 @@ PYC     ";"
 {L_A}      printf ("\nL_A: %s\n",yytext);
 {L_C}      printf ("\nL_C: %s\n",yytext);
 {PYC} {printf("\n PyC: %s \n", yytext); return PYC; }
-{COMA} printf("\n Coma: %s \n", yytext);
+{COMA} {printf("\n COMA: %s \n", yytext); return COMA; }
 
 "\n"
 "\t"

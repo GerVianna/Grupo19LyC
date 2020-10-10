@@ -5,3 +5,5 @@ contador: 0;
 suma: 02.5+0xA2B0;
 PUT "La suma es: ";
 PUT suma;
+actual: (contador/0.342) + (contador* maximo (actual*contador, 2,
+actual*pivot,maximo (4,actual,0b110) ) );

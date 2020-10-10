@@ -11,21 +11,23 @@ FILE *yyin;
 %}
 
 %token PUT
-%token PYC
+%token PYC COMA
 %token GET
 %token ID
-%token STRING CTE CTE_HEXA CTE_REAL
+%token MAXIMO
+%token STRING CTE CTE_HEXA CTE_REAL CTE_BIN
 %token OP_ASIG OP_SUM OP_RES OP_MUL OP_DIV P_A P_C
 
 %%
 
 programa			:			program {printf("Compilacion OK\n");}
 program				:			sentencia | program sentencia;
-sentencia			: 		    put | get | asignacion;
+sentencia			: 		    put | get | asignacion | maximo;
 
 put                 :           PUT factor PYC { printf("\n retorne put -> PUT STRING PYC\n\n");};
 get                 :           GET ID PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
-asignacion          :           ID OP_ASIG exp PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
+maximo              :           MAXIMO P_A lista P_C | MAXIMO P_A lista P_C PYC;
+asignacion          :           ID OP_ASIG exp PYC { printf("\n retorne asignacion ->ID OP_ASIG exp PYC\n\n");};
 
 exp:
 	term {printf("regla exp es termino\n "); }
@@ -39,8 +41,12 @@ term:
 	| factor { printf("regla termino es factor\n ");}
 	;
 
-factor: CTE | ID | STRING | CTE_HEXA | CTE_REAL { printf("\n retorne get ->GET STRING PYC\n\n");};
-
+factor: CTE | ID | STRING | CTE_HEXA | CTE_REAL | CTE_BIN | P_A exp P_C | maximo { printf("\n retorne factor ->regla factor\n\n");};
+lista: 
+     lista COMA exp
+     |exp
+     ;
+      
 %%
 
 int main(int argc, char *argv[]) {
