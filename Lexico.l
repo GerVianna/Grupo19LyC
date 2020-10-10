@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "y.tab.h"
+#include "tablasimbolos.c"
 FILE *yyin;
 int yylval;
 char *yyltext;
@@ -14,9 +15,14 @@ int yyerrork(void);
 
 PUT PUT
 GET GET
+DIM DIM
+AS AS
 IF  if
 ELSE    else
 WHILE   while
+INTEGER Integer 
+FLOAT Float 
+
 
 
 DIGITO [0-9]
@@ -44,22 +50,23 @@ P_A     "("
 P_C     ")"
 L_A     "{"
 L_C     "}"
-PyC     ";"
+PYC     ";"
 
 
 %%
-
+{DIM} printf("\nSentencia DIM: %s \n", yytext);
+{AS} printf("\nSentencia AS: %s \n", yytext);
 {IF}       printf ("\n Sentencia IF: %s\n",yytext);
 {ELSE}     printf ("\n Sentencia ELSE: %s\n",yytext);
 {WHILE}    printf ("\n Sentencia WHILE: %s\n",yytext);
-{PUT} printf("\n PUT: %s \n", yytext);
-{GET} {printf("\n GET: %s \n", yytext); return GET;}
+{PUT} {printf("\n PUT: %s \n", yytext); return PUT;}
+{GET} {printf("\n GET: %s \n", yytext);}
 {CTE} printf("\n Constante: %s\n", yytext);
 {CTE_HEXA} printf("\n Constante hexa: %s\n", yytext);
 {CTE_BIN} printf("\n Constante binaria: %s\n", yytext);
 {CTE_REAL} printf ("\n Constante real: %s\n",yytext);
-{STRING} printf("\n String: %s\n", yytext);
-{ID} printf("\n Identificador: %s\n", yytext);
+{STRING} {printf("\n STRING: %s \n", yytext); return STRING;}
+{ID} {printf("\n ID: %s \n", yytext); }
 {OP_ASIG} printf("\n Asignacion: %s\n", yytext);
 {OP_SUM} printf("\n Suma: %s\n", yytext);
 {OP_DIV} printf("\n Division: %s\n", yytext);
@@ -75,7 +82,7 @@ PyC     ";"
 {P_C}      printf ("\nP_C: %s\n",yytext);
 {L_A}      printf ("\nL_A: %s\n",yytext);
 {L_C}      printf ("\nL_C: %s\n",yytext);
-{PyC} printf("\n Semicolon: %s\n", yytext);
+{PYC} {printf("\n PyC: %s \n", yytext); return PYC; }
 {COMA} printf("\n Coma: %s \n", yytext);
 
 "\n"

@@ -10,12 +10,17 @@ FILE *yyin;
     int yylex();
 %}
 
-%token GET
+%token PUT
+%token STRING
+%token PYC
+
+
+
 
 %%
 
-get:
-    GET { printf("retorne alto GET\n");};
+put:
+    PUT STRING PYC{ printf("\n retorne put -> PUT STRING PYC\n");};
 
 %%
 

@@ -1,0 +1,3 @@
+PUT "Ingrese un valor entero para actual: ";
+PUT "Prueba.txt LyC Tema 2!";
+
