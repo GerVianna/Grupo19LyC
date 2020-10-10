@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "y.tab.h"
 FILE *yyin;
 int yylval;
 char *yyltext;
@@ -52,7 +53,7 @@ PyC     ";"
 {ELSE}     printf ("\n Sentencia ELSE: %s\n",yytext);
 {WHILE}    printf ("\n Sentencia WHILE: %s\n",yytext);
 {PUT} printf("\n PUT: %s \n", yytext);
-{GET} printf("\n GET: %s \n", yytext);
+{GET} {printf("\n GET: %s \n", yytext); return GET;}
 {CTE} printf("\n Constante: %s\n", yytext);
 {CTE_HEXA} printf("\n Constante hexa: %s\n", yytext);
 {CTE_BIN} printf("\n Constante binaria: %s\n", yytext);
@@ -84,16 +85,6 @@ PyC     ";"
 " "
 .       yyerror();
 %%
-
-int main(int argc, char *argv[]) {
-    if ((yyin = fopen(argv[1], "rt")) == NULL) {
-        printf("\n No se puede abrir el archivo");
-    } else {
-        yylex();
-    }
-    fclose(yyin);
-    return 0;
-}
 
 int yyerror(void) {
     printf("Error léxico: Caracter invalido: %s", yytext);
