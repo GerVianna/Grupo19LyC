@@ -5,3 +5,5 @@ gcc lex.yy.c y.tab.c -o compilador
 rm lex.yy.c
 rm y.output
 rm compilador
+rm y.tab.c
+rm y.tab.h

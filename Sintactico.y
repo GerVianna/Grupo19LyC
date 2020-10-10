@@ -6,7 +6,7 @@
 int yystopparser = 0;
 FILE *yyin;
 
-    int yyerrors();
+    int yyerror();
     int yylex();
 %}
 
@@ -15,7 +15,7 @@ FILE *yyin;
 %%
 
 get:
-    GET { printf(" GET\n");};
+    GET { printf("retorne alto GET\n");};
 
 %%
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-int yyerrors(void) {
+int yyerror(void) {
     printf("Error sintactico \n");
     exit(1);
 }

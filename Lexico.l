@@ -6,7 +6,7 @@ FILE *yyin;
 int yylval;
 char *yyltext;
 
-int yyerror(void);
+int yyerrork(void);
 %}
 
 %option noyywrap
@@ -83,10 +83,10 @@ PyC     ";"
 "\n\t"
 "\r\t"
 " "
-.       yyerror();
+.       yyerrork();
 %%
 
-int yyerror(void) {
+int yyerrork(void) {
     printf("Error léxico: Caracter invalido: %s", yytext);
     exit(1);
 }
