@@ -4,6 +4,9 @@
 #include "y.tab.h"
 // #include "tablasimbolos.c"
 int yystopparser = 0;
+int variablesDIM = 0;
+int tiposDIM = 0;
+
 FILE *yyin;
 
     int yyerror();
@@ -98,13 +101,13 @@ lista:
      ;
 
 lista_tipos:
-    lista_tipos COMA tipo
-    | tipo
+    lista_tipos COMA tipo { tiposDIM++; }
+    | tipo { tiposDIM++; } 
     ;
 
 lista_id:
-    lista_id COMA ID
-    | ID
+    lista_id COMA ID { variablesDIM++; } 
+    | ID { variablesDIM++; } 
     ;
 
 tipo:
@@ -119,6 +122,9 @@ int main(int argc, char *argv[]) {
     }
     else {
         yyparse();
+        if (tiposDIM != variablesDIM) {
+            printf("Parse failed: error en la declaracion de dim no coinciden la cantidad de VARIABLES con la cantidad de TIPOS\n");
+        };
     }
     fclose(yyin);
     return 0;
