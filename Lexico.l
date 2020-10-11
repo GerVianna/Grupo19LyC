@@ -23,6 +23,9 @@ WHILE   while
 INTEGER Integer 
 FLOAT Float
 MAXIMO maximo 
+SEP_AND and
+SEP_OR  or
+SEP_NOT  not
 
 
 
@@ -44,8 +47,8 @@ OP_DIST     "<"">"
 OP_IGUAL    "="
 MENOR       "<"
 MAYOR       ">"
-MENORIGUAL  "<""="
-MAYORIGUAL  ">""="
+MENOR_I  "<""="
+MAYOR_I  ">""="
 COMA        ","
 P_A     "("
 P_C     ")"
@@ -53,39 +56,45 @@ L_A     "{"
 L_C     "}"
 PYC     ";"
 
-
 %%
-{DIM} printf("\nSentencia DIM: %s \n", yytext);
-{AS} printf("\nSentencia AS: %s \n", yytext);
-{IF}       printf ("\n Sentencia IF: %s\n",yytext);
-{ELSE}     printf ("\n Sentencia ELSE: %s\n",yytext);
-{WHILE}    printf ("\n Sentencia WHILE: %s\n",yytext);
-{MAXIMO}   {printf("\n Maximo: %s \n", yytext); return MAXIMO;} 
-{PUT} {printf("\n PUT: %s \n", yytext); return PUT;}
-{GET} {printf("\n GET: %s \n", yytext); return GET;}
-{CTE} {printf("\n Constante: %s\n", yytext); return CTE;}
-{CTE_HEXA} {printf("\n Constante hexa: %s\n", yytext); return CTE_HEXA;}
-{CTE_BIN} {printf("\n Constante binaria: %s\n", yytext); return CTE_BIN;}
-{CTE_REAL} {printf ("\n Constante real: %s\n",yytext); return CTE_REAL;}
-{STRING} {printf("\n STRING: %s \n", yytext); return STRING;}
-{ID} {printf("\n ID: %s \n", yytext); return ID;}
-{OP_ASIG} {printf("\n Asignacion: %s\n", yytext); return OP_ASIG;}
-{OP_SUM} {printf("\n Suma: %s\n", yytext); return OP_SUM;}
-{OP_DIV} {printf("\n Division: %s\n", yytext); return OP_DIV;}
-{OP_MUL} {printf("\n Multiplicacion: %s\n", yytext); return OP_MUL;}
-{OP_RES}   {printf ("\n Resta: %s\n",yytext); return OP_RES;}
-{OP_DIST}  printf ("\n Distinto: %s\n",yytext);
-{OP_IGUAL}    printf ("\n Igual: %s\n",yytext);
-{MENOR} printf("\n Menor: %s\n", yytext);
-{MAYOR} printf("\n Mayor: %s\n", yytext);
-{MENORIGUAL} printf("\n Menor o igual: %s\n", yytext);
-{MAYORIGUAL} printf("\n Mayor o igual: %s\n", yytext);
-{P_A}      {printf ("\nP_A: %s\n",yytext); return P_A;}
-{P_C}      {printf ("\nP_C: %s\n",yytext); return P_C;}
-{L_A}      printf ("\nL_A: %s\n",yytext);
-{L_C}      printf ("\nL_C: %s\n",yytext);
-{PYC} {printf("\n PyC: %s \n", yytext); return PYC; }
-{COMA} {printf("\n COMA: %s \n", yytext); return COMA; }
+{INTEGER}   {return INTEGER;}
+{FLOAT}     {return FLOAT;}
+{DIM}       {return DIM;}
+{AS}        {return AS;}
+{IF}        {atoi(yytext); return IF;}
+{ELSE}      {return ELSE;}
+{WHILE}     {return WHILE;}
+{MAXIMO}    {return MAXIMO;} 
+{PUT}       {return PUT;}
+{GET}       {return GET;}
+{CTE}       {return CTE;}
+{CTE_HEXA}  {return CTE_HEXA;}
+{CTE_BIN}   {return CTE_BIN;}
+{CTE_REAL}  {return CTE_REAL;}
+{STRING}    {return STRING;}
+{SEP_AND}   {return SEP_AND;}
+{SEP_OR}    {return SEP_OR; }
+{SEP_NOT}   {return SEP_NOT;}
+{ID}        {return ID;}
+{OP_ASIG}   {return OP_ASIG;}
+{OP_SUM}    {return OP_SUM;}
+{OP_DIV}    {return OP_DIV;}
+{OP_MUL}    {return OP_MUL;}
+{OP_RES}    {return OP_RES;}
+{OP_DIST}   {return OP_DIST;}
+{OP_IGUAL}  {return OP_IGUAL;}
+{MENOR}     {return MENOR;}
+{MAYOR}     {return MAYOR;}
+{MENOR_I}   {return MENOR_I;}
+{MAYOR_I}   {return MAYOR_I;}
+{P_A}       {return P_A;}
+{P_C}       {return P_C;}
+{L_A}       {return L_A;}
+{L_C}       {return L_C;}
+{PYC}       {return PYC; }
+{COMA}      {return COMA; }
+
+
 
 "\n"
 "\t"
