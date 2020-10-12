@@ -11,14 +11,55 @@ FILE *yyin;
 
     int yyerror();
     int yylex();
+
+typedef struct
+{
+        char *nombre;
+        char *tipo;
+        union Valor{
+                int valor_int;
+                double valor_double;
+                char *valor_string;
+        }valor;
+        int longitud;
+}t_data;
+
+typedef struct simbolo
+{
+        t_data data;
+        struct simbolo *siguiente;
+}t_nodo;
+
+
+typedef struct
+{
+        t_nodo *primero;
+}t_tabla;
+
+t_tabla tablaSimbolos;
+
+void crearTablaSimbolos();
+
+int insertarEnTablaDeSimbolos(const char *nombre,const char *tipo, const char* valString, int valInt, double valDouble)
+
+void guardarTablaDeSimbolos();
+
 %}
 
-
+%union {
+int tipo_int;
+double tipo_double;
+char *tipo_string;
+}
 
 %token PUT GET MAXIMO DIM AS
 %token ID
 %token INTEGER FLOAT
-%token STRING CTE CTE_HEXA CTE_REAL CTE_BIN
+%token<tipo_string> STRING
+%token<tipo_int> CTE
+%token CTE_HEXA
+%token<tipo_double> CTE_REAL
+%token CTE_BIN
 %token OP_ASIG OP_SUM OP_RES OP_MUL OP_DIV OP_IGUAL OP_DIST P_A P_C L_A L_C MENOR MAYOR MAYOR_I MENOR_I PYC COMA
 %token WHILE IF ELSE
 %token SEP_AND SEP_NOT SEP_OR
@@ -29,7 +70,7 @@ FILE *yyin;
 
 %%
 
-programa			:			program {printf("Compilacion OK\n");};
+programa			:			program {guardarTablaDeSimbolos(); printf("Compilacion OK\n");};
 program				:			sentencia | program sentencia { printf("\n retorne program -> PROGRAM\n\n");};
 sentencia			: 		    put | get | asignacion | maximo | declaracion | while | if { printf("\n retorne sentencia -> SENTENCIA\n\n");};
 declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("\n retorne declaracion -> DIM LISTA AS LISTA\n\n");};
@@ -121,6 +162,7 @@ int main(int argc, char *argv[]) {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
     }
     else {
+        crearTablaSimbolos();
         yyparse();
         if (tiposDIM != variablesDIM) {
             printf("Parse failed: error en la declaracion de dim no coinciden la cantidad de VARIABLES con la cantidad de TIPOS\n");
@@ -133,4 +175,164 @@ int main(int argc, char *argv[]) {
 int yyerror(void) {
     printf("Error sintactico \n");
     exit(1);
+}
+
+void crearTablaSimbolos() {
+    tablaSimbolos.primero = NULL;
+}
+
+int insertarEnTablaDeSimbolos(const char *nombre,const char *tipo, const char* valString, int valInt, double valDouble)
+{
+    t_simbolo *tabla = tablaSimbolos.primero;
+    char nombreCTE[32] = "_";
+    strcat(nombreCTE, nombre);
+    
+    while(tabla)
+    {
+        if(strcmp(tabla->data.nombre, nombre) == 0 || strcmp(tabla->data.nombre, nombreCTE) == 0)
+        {
+            return 1;
+        }
+        
+        if(tabla->siguiente == NULL)
+        {
+            break;
+        }
+        tabla = tabla->siguiente;
+    }
+
+    t_data *data = (t_data*)malloc(sizeof(t_data));
+    data = crearDatos(nombre, tipo, valString, valInt, valDouble);
+
+    if(data == NULL)
+    {
+        return 1;
+    }
+
+    t_simbolo* nuevo = (t_simbolo*)malloc(sizeof(t_simbolo));
+
+    if(nuevo == NULL)
+    {
+        return 2;
+    }
+
+    nuevo->data = *data;
+    nuevo->siguiente = NULL;
+
+    if(tablaSimbolos.primero == NULL)
+    {
+        tablaSimbolos.primero = nuevo;
+    }
+    else
+    {
+        tabla->siguiente = nuevo;
+    }
+
+    return 0;
+}
+
+t_data* crearDatos(const char *nombre, const char *tipo, const char* valString, int valInt, double valDouble)
+{
+    char full[32] = "_";
+    char aux[20];
+
+    t_data *data = (t_data*)calloc(1, sizeof(t_data));
+    if(data == NULL)
+    {
+        return NULL;
+    }
+
+    data->tipo = (char*)malloc(sizeof(char) * (strlen(tipo) + 1));
+    strcpy(data->tipo, tipo);
+
+    //Es una variable
+    if(strcmp(tipo, "STRING")==0 || strcmp(tipo, "INT")==0 || strcmp(tipo, "FLOAT")==0)
+    {
+        //al nombre lo dejo aca porque no lleva _
+        data->nombre = (char*)malloc(sizeof(char) * (strlen(nombre) + 1));
+        strcpy(data->nombre, nombre);
+        return data;
+    }
+    else
+    {      //Son constantes: tenemos que agregarlos a la tabla con "_" al comienzo del nombre, hay que agregarle el valor
+        if(strcmp(tipo, "CONST_STR") == 0)
+        {
+            data->valor.valor_str = (char*)malloc(sizeof(char) * strlen(valString) +1);
+            data->nombre = (char*)malloc(sizeof(char) * (strlen(valString) + 1));
+            strcat(full, valString);
+            strcpy(data->nombre, full);    
+            strcpy(data->valor.valor_str, valString);
+        }
+        if(strcmp(tipo, "CONST_REAL") == 0)
+        {
+            sprintf(aux, "%g", valDouble);
+            strcat(full, aux);
+            data->nombre = (char*)malloc(sizeof(char) * strlen(full));
+
+            strcpy(data->nombre, full);
+            data->valor.valor_double = valDouble;
+        }
+        if(strcmp(tipo, "CONST_INT") == 0)
+        {
+            sprintf(aux, "%d", valInt);
+            strcat(full, aux);
+            data->nombre = (char*)malloc(sizeof(char) * strlen(full));
+            strcpy(data->nombre, full);
+            data->valor.valor_int = valInt;
+        }
+        return data;
+    }
+    return NULL;
+}
+
+void guardarTablaDeSimbolos()
+{
+    FILE* archivo;
+    if((archivo = fopen("ts.txt", "wt")) == NULL)
+    {
+            printf("\nNo se pudo crear la tabla de simbolos.\n\n");
+            return;
+    }
+    else if(tablaSimbolos.primero == NULL)
+            return;
+    
+    fprintf(archivo, "%-30s%-30s%-30s%-30s\n", "NOMBRE", "TIPODATO", "VALOR", "LONGITUD");
+
+    t_simbolo *aux;
+    t_simbolo *tabla = tablaSimbolos.primero;
+    char linea[100];
+
+    while(tabla)
+    {
+        aux = tabla;
+        tabla = tabla->siguiente;
+        
+        if(strcmp(aux->data.tipo, "INT") == 0) //variable int
+        {
+            sprintf(linea, "%-30s%-30s%-30s%-d\n", aux->data.nombre, aux->data.tipo, "--", strlen(aux->data.nombre));
+        }
+        else if(strcmp(aux->data.tipo, "CONST_INT") == 0)
+        {
+            sprintf(linea, "%-30s%-30s%-30d%-d\n", aux->data.nombre, aux->data.tipo, aux->data.valor.valor_int, strlen(aux->data.nombre) -1);
+        }
+        else if(strcmp(aux->data.tipo, "FLOAT") ==0)
+        {
+            sprintf(linea, "%-30s%-30s%-30s%-d\n", aux->data.nombre, aux->data.tipo, "--", strlen(aux->data.nombre));
+        }
+        else if(strcmp(aux->data.tipo, "CONST_REAL") == 0)
+        {
+            sprintf(linea, "%-30s%-30s%-30g%-d\n", aux->data.nombre, aux->data.tipo, aux->data.valor.valor_double, strlen(aux->data.nombre) -1);
+        }
+        else if(strcmp(aux->data.tipo, "STRING") == 0)
+        {
+            sprintf(linea, "%-30s%-30s%-30s%-d\n", aux->data.nombre, aux->data.tipo, "--", strlen(aux->data.nombre));
+        }
+        else if(strcmp(aux->data.tipo, "CONST_STR") == 0)
+        {
+            sprintf(linea, "%-30s%-30s%-30s%-d\n", aux->data.nombre, aux->data.tipo, aux->data.valor.valor_string, strlen(aux->data.nombre) -1);
+        }
+        fprintf(archivo, "%s", linea);
+        free(aux);
+    }
+    fclose(archivo); 
 }
