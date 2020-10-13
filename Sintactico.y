@@ -186,7 +186,8 @@ int main(int argc, char *argv[]) {
     else {
         crearTablaSimbolos();
         yyparse();
-        for(int i = 0; i < variablesDIM; i++) {
+		int i = 0;
+        for(i = 0; i < variablesDIM; i++) {
             insertarEnTablaDeSimbolos(vecId[i], vecTipos[i], "CTE_STRING", 0, 0 );
         }
         guardarTablaDeSimbolos();
