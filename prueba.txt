@@ -1,6 +1,7 @@
 DIM < contador,promedio,actual,suma> AS < Integer,Float,Float,Float >
 PUT "Prueba.txt LyC Tema 2!";
-PUT "Ingrese un valor entero para actual: ";
+*-PUT "Ingrese un valor entero para actual: "; comentamos esto porque supera 30 caracteres-*
+PUT "Ingrese un valor entero: ";
 GET actual;
 contador: 0;
 suma: 02.5+0xA2B0;

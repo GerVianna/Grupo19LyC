@@ -1,13 +1,16 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "y.tab.h"
-#include "tablasimbolos.c"
 FILE *yyin;
-int yylval;
 char *yyltext;
 
-int yyerrork(void);
+int yyerrorl(void);
+int yyerrorm(char*);
+void validarString(char*);
+void validarFloat(double);
+void validarInt(int);
 %}
 
 %option noyywrap
@@ -20,6 +23,7 @@ AS AS
 IF  if
 ELSE    else
 WHILE   while
+STRING  String
 INTEGER Integer 
 FLOAT Float
 MAXIMO maximo 
@@ -34,9 +38,10 @@ LETRA [a-zA-Z]
 CTE_HEXA 0x[0-9A-F]+
 CTE_BIN 0b[0-1]+
 CTE         {DIGITO}+
-CTE_REAL {DIGITO}+"."{DIGITO}*
+CTE_REAL {DIGITO}*[.]{DIGITO}+|{DIGITO}+[.]{DIGITO}*
 ID          {LETRA}({LETRA}|{DIGITO})*
-STRING  \"(\\.|[^"\\])*\"
+CTE_STRING  \"(\\.|[^"\\])*\"
+COMENTARIO \*-.*-\*
 
 OP_ASIG     ":"
 OP_SUM      "+"
@@ -57,25 +62,63 @@ L_C     "}"
 PYC     ";"
 
 %%
-{INTEGER}   {return INTEGER;}
-{FLOAT}     {return FLOAT;}
+{INTEGER}   {
+                yylval.tipo_string = yytext;
+                return INTEGER;
+            }	
+{FLOAT}     {
+                yylval.tipo_string = yytext;
+                return FLOAT;
+            }	
+{STRING}    {
+                yylval.tipo_string = yytext;
+                return STRING;
+            }	
 {DIM}       {return DIM;}
 {AS}        {return AS;}
-{IF}        {atoi(yytext); return IF;}
+{IF}        {return IF;}
 {ELSE}      {return ELSE;}
 {WHILE}     {return WHILE;}
 {MAXIMO}    {return MAXIMO;} 
 {PUT}       {return PUT;}
 {GET}       {return GET;}
-{CTE}       {return CTE;}
-{CTE_HEXA}  {return CTE_HEXA;}
-{CTE_BIN}   {return CTE_BIN;}
-{CTE_REAL}  {return CTE_REAL;}
-{STRING}    {return STRING;}
+{CTE}       { 
+            yylval.tipo_int = atoi(yytext);
+            validarInt(yylval.tipo_int);
+            insertarEnTablaDeSimbolos(yytext, "CTE", "", yylval.tipo_int, 0);
+            return CTE;
+            }
+{CTE_HEXA}  {
+            yylval.tipo_string = yytext;
+            validarString(yylval.tipo_string);
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            return CTE_HEXA;
+            }
+{CTE_BIN}   {
+            yylval.tipo_string = yytext;
+            validarString(yylval.tipo_string);
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            return CTE_BIN;
+            }
+{CTE_REAL}  {
+            yylval.tipo_double = atof(yytext);
+            validarFloat(yylval.tipo_double);
+            insertarEnTablaDeSimbolos(yytext, "CTE_REAL", "", 0, yylval.tipo_double);
+            return CTE_REAL;
+            }
+{CTE_STRING} {
+            yylval.tipo_string = yytext;
+            validarString(yylval.tipo_string);
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            return CTE_STRING;
+            }
 {SEP_AND}   {return SEP_AND;}
 {SEP_OR}    {return SEP_OR; }
 {SEP_NOT}   {return SEP_NOT;}
-{ID}        {return ID;}
+{ID}        {
+                yylval.tipo_string = yytext;
+                return ID;
+            }	
 {OP_ASIG}   {return OP_ASIG;}
 {OP_SUM}    {return OP_SUM;}
 {OP_DIV}    {return OP_DIV;}
@@ -93,7 +136,7 @@ PYC     ";"
 {L_C}       {return L_C;}
 {PYC}       {return PYC; }
 {COMA}      {return COMA; }
-
+{COMENTARIO}
 
 
 "\n"
@@ -101,12 +144,44 @@ PYC     ";"
 "\n\t"
 "\r\t"
 " "
-.       yyerrork();
+.       yyerrorl();
 %%
 
-int yyerrork(void) {
+int yyerrorl(void) {
     printf("Error léxico: Caracter invalido: %s", yytext);
     exit(1);
+}
+
+int yyerrorm(char* mensaje) {
+    printf("\n%s\n", mensaje);
+    exit(1);
+}
+
+void validarString(char *cadena)
+{
+    int largo = strlen(cadena);
+    if(largo > 31)
+    {
+        yyerrorm("Error: Rango de String excedido. Se permite un maximo de 30 caracteres");
+    }
+}
+
+void validarFloat(double numero)
+{   
+    double max = 3.402823 * pow(10, 38);
+    double min = 1.175494 * pow(10, -38);
+    if(numero > max || (numero > 0 && numero < min))
+    {
+        yyerrorm("Error: Rango de Float excedido. Se permite entre [1.175494*10^-38; 3.402823*10^38] o cero.\n");
+    }
+}
+
+void validarInt(int numero)
+{
+    if(numero > 65535)
+    {
+        yyerrorm("Error: Valor de Integer excedido, el mayor posible es 65535");
+    }
 }
 
 /*
