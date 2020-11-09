@@ -5,6 +5,7 @@
 #include "y.tab.h"
 #include "lib/tercetos.h"
 #include "lib/tercetos.c"
+#include "lib/pila.c"
 // #include "tablasimbolos.c"
 int yystopparser = 0;
 int variablesDIM = 0;
@@ -33,6 +34,12 @@ char varItoa[30];
 char varString[30];
 char varID[30];
 char varReal[30];
+
+//Pila
+
+Pila pilaExpresion;
+Pila pilaIf;
+
 
 typedef struct
 {
@@ -85,7 +92,7 @@ void guardarTablaDeSimbolos();
 %token<tipo_int> CTE
 %token<tipo_string> CTE_HEXA
 %token<tipo_double> CTE_REAL
-%token CTE_BIN
+%token<tipo_string> CTE_BIN
 %token OP_ASIG OP_SUM OP_RES OP_MUL OP_DIV OP_IGUAL OP_DIST P_A P_C L_A L_C MENOR MAYOR MAYOR_I MENOR_I PYC COMA
 %token WHILE IF ELSE
 %token SEP_AND SEP_NOT SEP_OR
@@ -114,7 +121,8 @@ put                 :           PUT CTE  			    //{crear_terceto("PUT",yyval.tip
 get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
 maximo              :           MAXIMO P_A lista P_C | MAXIMO P_A lista P_C PYC { printf("\n retorne maximo -> MAXIMO\n\n");};
 asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp PYC { 
-                                    itoa(Eind,EindString,10);
+                                    int auxEind= desapilar(&pilaExpresion);
+                                    itoa(auxEind,EindString,10);
                                     crear_terceto(":=",varID,EindString);
                                     printf("\n retorne asignacion ->ID OP_ASIG exp PYC\n\n");
                                 };
@@ -125,56 +133,156 @@ while:
 ;
 
 if:
-    IF P_A condicion P_C L_A program L_C else
-    | IF P_A condicion P_C sentencia else
-    | IF P_A condicion P_C L_A program L_C
-    | IF P_A condicion P_C sentencia
+    IF P_A condicion_simple P_C L_A program L_C {
+                                        int bi=crear_terceto("BI","_","_");
+                                        char valorActual[4];
+                                        int pivote=desapilar(&pilaIf);
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                        apilar(&pilaIf,bi);
+                                        }else
+
+
+    | IF P_A condicion_simple P_C sentencia {
+                                        int bi=crear_terceto("BI","_","_");
+                                        char valorActual[4];
+                                        int pivote=desapilar(&pilaIf);
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                        apilar(&pilaIf,bi);
+                                        }else
+
+    | IF P_A condicion_simple P_C L_A program L_C{
+                        char valorActual[4];
+                        int pivote = desapilar(&pilaIf);
+                           itoa(obtenerIndiceTercetos(),valorActual,10);
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);}
+
+    | IF P_A condicion_simple P_C sentencia{
+                        char valorActual[4];
+                        int pivote = desapilar(&pilaIf);
+                           itoa(obtenerIndiceTercetos(),valorActual,10);
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);}
+    
+    
+    |
+IF P_A condicion P_C L_A program L_C {
+                                        int bi=crear_terceto("BI","_","_");
+                                        char valorActual[4];
+                                        int pivote=desapilar(&pilaIf);
+                                        int tercetoActual=obtenerIndiceTercetos();
+                                        itoa(tercetoActual,valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         pivote=desapilar(&pilaIf);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         apilar(&pilaIf,bi);
+                                        }else
+
+
+    | IF P_A condicion P_C sentencia {
+                                        int bi=crear_terceto("BI","_","_");
+                                        char valorActual[4];
+                                        int pivote=desapilar(&pilaIf);
+                                        int tercetoActual=obtenerIndiceTercetos();
+                                        itoa(tercetoActual,valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         pivote=desapilar(&pilaIf);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         apilar(&pilaIf,bi);
+                                        }else
+
+    | IF P_A condicion P_C L_A program L_C{
+                        char valorActual[4];
+                        int pivote = desapilar(&pilaIf);
+                           int tercetoActual=obtenerIndiceTercetos();
+                                        itoa(tercetoActual,valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         pivote=desapilar(&pilaIf);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+
+    | IF P_A condicion P_C sentencia{
+                        char valorActual[4];
+                        int pivote = desapilar(&pilaIf);
+                          int tercetoActual=obtenerIndiceTercetos();
+                                        itoa(tercetoActual,valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         pivote=desapilar(&pilaIf);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+
+
 ;
 
 else:
-    ELSE L_A program L_C
-    | ELSE sentencia
+    ELSE L_A program L_C{int pivote=desapilar(&pilaIf);
+                            char valorActual[4];
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+    | ELSE sentencia{int pivote=desapilar(&pilaIf);
+                            char valorActual[4];
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
 ;
 
 
 
 
 condicion_simple:
-    exp 
-    operador 
-    exp 
+             exp MENOR exp {
+                    char auxEind1[4];
+
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BGE","_","_");
+                    apilar(&pilaIf,numTerceto);}
+
+        |
+             exp MAYOR exp {
+                    char auxEind1[4];
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BLE","_","_");
+                    apilar(&pilaIf,numTerceto);
+    };
 
 condicion:
-    condicion_simple separador_logico condicion_simple {printf("\ncondicion_simple separador_logico condicion_simple\n"); }
-    | condicion_simple {printf("\ncondicion_simple\n"); }
+    condicion_simple SEP_AND condicion_simple {
+        printf("\ncondicion_simple separador_logico condicion_simple\n"); }
+    //| condicion_simple {printf("\ncondicion_simple\n"); }
 ;
-separador_logico:
+/*separador_logico:
     SEP_AND {printf("\nSEP_AND\n"); }
     | SEP_OR {printf("\n SEP_OR\n");}
     | SEP_NOT {printf("\n SEP_NOT\n");}
-;
+;*/
 
-operador: 
+/*operador: 
     MAYOR       //{crear_terceto(BLE,"?","?");}
     | MENOR     //{crear_terceto(BGE,"?","?");}
     | MAYOR_I   //{crear_terceto(BLT,"?","?");}
     | MENOR_I   //{crear_terceto(BGT,"?","?");}
     | OP_DIST   //{crear_terceto(BEQ,"?","?");}
     | OP_IGUAL  //{crear_terceto(BNE,"?","?");}
-;
+;*/
 
 exp:
 	exp OP_SUM term { 
         itoa(Eind,EindString,10);
         itoa(Tind,TindString,10);
-        //Eind=crear_terceto("+",EindString,TindString); 
+        Eind=crear_terceto("+",EindString,TindString); 
+        apilar(&pilaExpresion,Eind);
     }
 	| exp OP_RES term { 
         itoa(Eind,EindString,10);
         itoa(Tind,TindString,10);
-        //Eind=crear_terceto("-",EindString,TindString); 
+        Eind=crear_terceto("-",EindString,TindString);
+        apilar(&pilaExpresion,Eind) ;
     }
-    | term { Eind=Tind; }
+    | term { Eind=Tind; 
+      apilar(&pilaExpresion,Eind) ;}
 
 	;
 term:
@@ -197,7 +305,7 @@ factor: CTE {
             strcat(varString, varItoa);
             Find = crear_terceto(varString,"_","_");
         };
-        | ID //{ Find = crear_terceto(yyval.tipo_string,"_","_");}; 
+        | ID { Find = crear_terceto($1,"_","_");}; 
         | CTE_STRING //{ Find = crear_terceto(yyval.tipo_string,"_","_");}; 
         | CTE_HEXA { 
             Find = crear_terceto($1,"_","_");
@@ -208,7 +316,7 @@ factor: CTE {
             strcat(varReal, varString);
             Find = crear_terceto(varReal,"_","_");
         };
-        | CTE_BIN //{ Find = crear_terceto(yyval.tipo_string,"_","_");};
+        | CTE_BIN { Find = crear_terceto($1,"_","_");};
         | P_A exp P_C 
         | maximo { printf("\n retorne factor ->regla factor\n\n");};
 lista: 
@@ -248,6 +356,8 @@ int main(int argc, char *argv[]) {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
     }
     else {
+        pilaExpresion = crearPila();
+        pilaIf = crearPila();
         crearTablaSimbolos();
         yyparse();
 		int i = 0;

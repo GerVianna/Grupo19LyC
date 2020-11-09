@@ -12,6 +12,8 @@ terceto vector_tercetos[1000];
 
 int crear_terceto(char*, char*, char*);
 void escribir_tercetos();
+int obtenerIndiceTercetos();
+void setIndiceTercetos(int);
 
 static int indice_terceto = 0;
 
