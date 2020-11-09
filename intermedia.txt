@@ -1,9 +1,0 @@
-[0] (PUT,"Prueba.txt LyC Tema 2!",_)
-[1] (PUT,"Ingrese un valor entero: ",_)
-[2] (GET,actual,_)
-[3] (_0,_,_)
-[4] (:=,contador,3)
-[5] (_2.50,_,_)
-[6] (0xA2B0,_,_)
-
-[8] (:=,suma,7)
