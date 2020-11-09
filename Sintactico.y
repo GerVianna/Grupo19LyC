@@ -39,6 +39,7 @@ char varReal[30];
 
 Pila pilaExpresion;
 Pila pilaIf;
+Pila pilaTermino;
 
 
 typedef struct
@@ -107,29 +108,60 @@ void guardarTablaDeSimbolos();
 %%
 
 programa			:			program { printf("Compilacion OK\n");};
-program				:			sentencia | program sentencia { printf("\n retorne program -> PROGRAM\n\n");};
-sentencia			: 		    put | get | asignacion | maximo | declaracion | while | if { printf("\n retorne sentencia -> SENTENCIA\n\n");};
-declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("");};
 
-put                 :           PUT CTE  			    //{crear_terceto("PUT",yyval.tipo_int,"_");} PYC;
-                                | PUT ID                {crear_terceto("PUT",$2,"_");} PYC;
-                                | PUT CTE_STRING        {crear_terceto("PUT",$2,"_");} PYC;   
-                                | PUT CTE_HEXA          //{crear_terceto("PUT",$2,"_");} PYC;
-                                | PUT CTE_REAL          //{crear_terceto("PUT",yyval.tipo_double,"_");} PYC;
-                                | PUT CTE_BIN           //{crear_terceto("PUT",$2,"_");} PYC;  
+program				:			sentencia { printf("\n Regla 0\n\n");}
+                                | program sentencia { printf("\n Regla 1\n\n");};
 
-get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
-maximo              :           MAXIMO P_A lista P_C | MAXIMO P_A lista P_C PYC { printf("\n retorne maximo -> MAXIMO\n\n");};
+sentencia			: 		    put { printf("\n Regla 2\n\n");} 
+                                | get { printf("\n Regla 3\n\n");}
+                                | asignacion { printf("\n Regla 4\n\n");}
+                                | maximo { printf("\n Regla 5 \n\n");}
+                                | declaracion{ printf("\n Regla 6\n\n");}
+                                | while{ printf("\n Regla 7\n\n");}
+                                | if { printf("\n Regla 8\n\n");};
+
+declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("\n Regla 9\n\n");};
+
+put                 :           PUT CTE  			    {itoa($2,varItoa,10);
+                                                         strcpy(varString,"_");
+                                                         strcat(varString, varItoa);
+                                                         crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 10 \n\n");}
+
+                                | PUT ID                {strcpy(varString,"_");
+                                                         strcat(varString, $2);
+                                                         crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 11 \n\n");}
+
+                                | PUT CTE_STRING        {strcpy(varString,"_");
+                                                         strcat(varString, $2);
+                                                         crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 12\n\n");} 
+
+                                | PUT CTE_HEXA          {strcpy(varString,"_");
+                                                         strcat(varString, $2);
+                                                         crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 13\n\n");}
+                                | PUT CTE_REAL          {sprintf(varString,"%.2f",$2);
+                                                         strcpy(varReal,"_");
+                                                         strcat(varReal, varString);
+                                                         crear_terceto("PUT",varReal,"_");} PYC { printf("\n Regla 14\n\n");}
+
+                                | PUT CTE_BIN           {strcpy(varString,"_");
+                                                         strcat(varString, $2);
+                                                         crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 15\n\n");}
+;
+get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n Regla 16\n\n");} ;
+
+maximo              :           MAXIMO P_A lista P_C { printf("\n Regla 63\n\n");}
+                                | MAXIMO P_A lista P_C PYC { printf("\n Regla 17\n\n");};
+
 asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp PYC { 
                                     int auxEind= desapilar(&pilaExpresion);
                                     itoa(auxEind,EindString,10);
                                     crear_terceto(":=",varID,EindString);
-                                    printf("\n retorne asignacion ->ID OP_ASIG exp PYC\n\n");
+                                    printf("\n Regla 18\n\n");
                                 };
 
 while:
-    WHILE P_A condicion P_C L_A program L_C 
-    | WHILE P_A condicion P_C sentencia
+    WHILE P_A condicion P_C L_A program L_C { printf("\n Regla 19\n\n");}
+    | WHILE P_A condicion P_C sentencia { printf("\n Regla 20\n\n");}
 ;
 
 if:
@@ -140,7 +172,7 @@ if:
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                         apilar(&pilaIf,bi);
-                                        }else
+                                        }else { printf("\n Regla 21 \n\n");}
 
 
     | IF P_A condicion_simple P_C sentencia {
@@ -150,19 +182,21 @@ if:
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                         apilar(&pilaIf,bi);
-                                        }else
+                                        }else { printf("\n Regla 22\n\n");}
 
     | IF P_A condicion_simple P_C L_A program L_C{
                         char valorActual[4];
                         int pivote = desapilar(&pilaIf);
                            itoa(obtenerIndiceTercetos(),valorActual,10);
-                            strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);
+                            printf("\n Regla 23\n\n");}
 
     | IF P_A condicion_simple P_C sentencia{
                         char valorActual[4];
                         int pivote = desapilar(&pilaIf);
                            itoa(obtenerIndiceTercetos(),valorActual,10);
-                            strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);
+                             printf("\n Regla 24\n\n");}
     
     
     |
@@ -176,7 +210,7 @@ IF P_A condicion P_C L_A program L_C {
                                          pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                          apilar(&pilaIf,bi);
-                                        }else
+                                        }else { printf("\n Regla 25\n\n");}
 
 
     | IF P_A condicion P_C sentencia {
@@ -189,7 +223,7 @@ IF P_A condicion P_C L_A program L_C {
                                          pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                          apilar(&pilaIf,bi);
-                                        }else
+                                        }else { printf("\n Regla 26\n\n");}
 
     | IF P_A condicion P_C L_A program L_C{
                         char valorActual[4];
@@ -198,7 +232,8 @@ IF P_A condicion P_C L_A program L_C {
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                          pivote=desapilar(&pilaIf);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         printf("\n Regla 27\n\n");}
 
     | IF P_A condicion P_C sentencia{
                         char valorActual[4];
@@ -207,7 +242,8 @@ IF P_A condicion P_C L_A program L_C {
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                          pivote=desapilar(&pilaIf);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         printf("\n Regla 28\n\n");}
 
 
 ;
@@ -216,11 +252,13 @@ else:
     ELSE L_A program L_C{int pivote=desapilar(&pilaIf);
                             char valorActual[4];
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         printf("\n Regla 29 \n\n");}
     | ELSE sentencia{int pivote=desapilar(&pilaIf);
                             char valorActual[4];
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);}
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                         printf("\n Regla 30\n\n");}
 ;
 
 
@@ -235,7 +273,8 @@ condicion_simple:
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BGE","_","_");
-                    apilar(&pilaIf,numTerceto);}
+                    apilar(&pilaIf,numTerceto);
+                    printf("\n Regla 31\n\n");}
 
         |
              exp MAYOR exp {
@@ -246,11 +285,60 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BLE","_","_");
                     apilar(&pilaIf,numTerceto);
-    };
+                    printf("\n Regla 32\n\n");}
+                    
+        |   exp MENOR_I exp {
+                    char auxEind1[4];
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BGT","_","_");
+                    apilar(&pilaIf,numTerceto);
+                    printf("\n Regla 33\n\n");
+        } 
+
+        |   exp MAYOR_I exp {
+                    char auxEind1[4];
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BLT","_","_");
+                    apilar(&pilaIf,numTerceto);
+                    printf("\n Regla 34\n\n");
+        }
+
+        |   exp OP_IGUAL exp {
+                    char auxEind1[4];
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BNE","_","_");
+                    apilar(&pilaIf,numTerceto);
+                    printf("\n Regla 35\n\n");
+        }
+
+        |   exp OP_DIST exp {
+                    char auxEind1[4];
+                    itoa(desapilar(&pilaExpresion),auxEind1,10);
+                    char auxEind2[4];
+                    itoa(desapilar(&pilaExpresion),auxEind2,10);
+                    crear_terceto("CMP",auxEind2,auxEind1);
+                    int numTerceto=crear_terceto("BEQ","_","_");
+                    apilar(&pilaIf,numTerceto);
+                    printf("\n Regla 36\n\n");
+                          
+        }       
+                    ;
 
 condicion:
-    condicion_simple SEP_AND condicion_simple {
-        printf("\ncondicion_simple separador_logico condicion_simple\n"); }
+    condicion_simple SEP_AND condicion_simple { printf("\n Regla 37\n\n");}
+
+// | condicion_simple SEP_OR condicion_simple { printf("\n Regla 38\n\n");}
+// |condicion_simple SEP_NOT condicion_simple { printf("\n Regla 39\n\n");}
+
     //| condicion_simple {printf("\ncondicion_simple\n"); }
 ;
 /*separador_logico:
@@ -274,29 +362,38 @@ exp:
         itoa(Tind,TindString,10);
         Eind=crear_terceto("+",EindString,TindString); 
         apilar(&pilaExpresion,Eind);
+        printf("\n Regla 40\n\n");
     }
 	| exp OP_RES term { 
         itoa(Eind,EindString,10);
         itoa(Tind,TindString,10);
         Eind=crear_terceto("-",EindString,TindString);
         apilar(&pilaExpresion,Eind) ;
+        printf("\n Regla 41\n\n");
     }
     | term { Eind=Tind; 
-      apilar(&pilaExpresion,Eind) ;}
+      apilar(&pilaExpresion,Eind) ;
+      printf("\n Regla 42\n\n");}
 
 	;
 term:
 	term OP_MUL factor { 
         itoa(Tind,TindString,10);
         itoa(Find,FindString,10);
-        //Tind=crear_terceto("*",TindString,FindString);
+        Tind=crear_terceto("*",TindString,FindString);
+        apilar(&pilaTermino,Tind) ;
+        printf("\n Regla 43\n\n");
     }
 	|term OP_DIV factor { 
         itoa(Tind,TindString,10);
         itoa(Find,FindString,10);
-        //Tind=crear_terceto("/",TindString,FindString);
+        Tind=crear_terceto("/",TindString,FindString);
+        apilar(&pilaTermino,Tind) ;
+        printf("\n Regla 44\n\n");
     }
-	| factor { Tind = Find;}
+	| factor { Tind = Find;
+    apilar(&pilaTermino,Tind) ;
+    printf("\n Regla 45\n\n");}
 	;
 
 factor: CTE {  
@@ -304,49 +401,71 @@ factor: CTE {
             strcpy(varString,"_");
             strcat(varString, varItoa);
             Find = crear_terceto(varString,"_","_");
-        };
-        | ID { Find = crear_terceto($1,"_","_");}; 
-        | CTE_STRING //{ Find = crear_terceto(yyval.tipo_string,"_","_");}; 
+            printf("\n Regla 46\n\n");
+        }
+        | ID { Find = crear_terceto($1,"_","_");
+                    printf("\n Regla 47\n\n");}
+        | CTE_STRING {Find = crear_terceto($1,"_","_");
+                    printf("\n Regla 48\n\n");} 
+
         | CTE_HEXA { 
             Find = crear_terceto($1,"_","_");
-        }; 
+            printf("\n Regla 49\n\n");
+        } 
         | CTE_REAL { 
             sprintf(varString,"%.2f",$1);
             strcpy(varReal,"_");
             strcat(varReal, varString);
             Find = crear_terceto(varReal,"_","_");
-        };
-        | CTE_BIN { Find = crear_terceto($1,"_","_");};
-        | P_A exp P_C 
-        | maximo { printf("\n retorne factor ->regla factor\n\n");};
+             printf("\n Regla 50\n\n");
+        }
+        | CTE_BIN { Find = crear_terceto($1,"_","_");
+                 printf("\n Regla 51\n\n");}
+
+        | P_A exp P_C  { printf("\n Regla 52\n\n");}
+
+        | maximo { printf("\n Regla 53\n\n");}
+        ;
 lista: 
      lista COMA exp
+     { printf("\n Regla 54\n\n");}
+
      |exp
+     { printf("\n Regla 55\n\n");}
      ;
 
 lista_tipos:
     lista_tipos COMA tipo { 
             strcpy(vecTipos[tiposDIM], $3);
             tiposDIM++; 
+            printf("\n Regla 56\n\n");
             }
     | tipo { 
             strcpy(vecTipos[tiposDIM], $1);
             tiposDIM++; 
+            printf("\n Regla 57\n\n");
             } 
     ;
 
 lista_id:
     lista_id COMA ID { 
             strcpy(vecId[variablesDIM], $3);
-            variablesDIM++; } 
+            variablesDIM++; 
+            printf("\n Regla 58\n\n");} 
     | ID { 
             strcpy(vecId[variablesDIM], $1);
             variablesDIM++;
+            printf("\n Regla 59\n\n");
          } 
     ;
 
 tipo:
-    INTEGER {$<tipo_string>$ = $1;} | FLOAT {$<tipo_string>$ = $1;} | STRING {$<tipo_string>$ = $1;}
+    INTEGER {$<tipo_string>$ = $1; 
+            printf("\n Regla 60\n\n");}
+    | FLOAT {$<tipo_string>$ = $1;
+            printf("\n Regla 61\n\n");} 
+    | STRING {$<tipo_string>$ = $1;
+            printf("\n Regla 62\n\n");}
     ;
 %%
 
@@ -358,6 +477,7 @@ int main(int argc, char *argv[]) {
     else {
         pilaExpresion = crearPila();
         pilaIf = crearPila();
+        pilaTermino = crearPila();
         crearTablaSimbolos();
         yyparse();
 		int i = 0;
