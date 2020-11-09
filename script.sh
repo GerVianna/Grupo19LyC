@@ -2,7 +2,7 @@ flex Lexico.l
 bison -dyv Sintactico.y
 gcc lex.yy.c y.tab.c -o compilador
 gcc lex.yy.c y.tab.c -o Ejecutable.exe
-./compilador prueba2.txt
+./compilador prueba3.txt
 rm lex.yy.c
 rm y.output
 rm compilador

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "y.tab.h"
+#include "lib/tercetos.h"
+#include "lib/tercetos.c"
 // #include "tablasimbolos.c"
 int yystopparser = 0;
 int variablesDIM = 0;
@@ -13,8 +15,24 @@ char vecTipos [50][32];
 
 FILE *yyin;
 
-    int yyerror();
-    int yylex();
+int yyerror();
+int yylex();
+
+//Indices para tercetos
+int Find = 0;
+int Tind = 0;
+int Eind = 0;
+
+//Indices en string
+char FindString[3];
+char TindString[3];
+char EindString[3];
+
+//Variable String para los itoa
+char varItoa[30];
+char varString[30];
+char varID[30];
+char varReal[30];
 
 typedef struct
 {
@@ -65,7 +83,7 @@ void guardarTablaDeSimbolos();
 %token<tipo_string> STRING
 %token<tipo_string> CTE_STRING
 %token<tipo_int> CTE
-%token CTE_HEXA
+%token<tipo_string> CTE_HEXA
 %token<tipo_double> CTE_REAL
 %token CTE_BIN
 %token OP_ASIG OP_SUM OP_RES OP_MUL OP_DIV OP_IGUAL OP_DIST P_A P_C L_A L_C MENOR MAYOR MAYOR_I MENOR_I PYC COMA
@@ -86,10 +104,20 @@ program				:			sentencia | program sentencia { printf("\n retorne program -> PRO
 sentencia			: 		    put | get | asignacion | maximo | declaracion | while | if { printf("\n retorne sentencia -> SENTENCIA\n\n");};
 declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("");};
 
-put                 :           PUT factor PYC { printf("\n retorne put -> PUT STRING PYC\n\n");};
-get                 :           GET ID PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
+put                 :           PUT CTE  			    //{crear_terceto("PUT",yyval.tipo_int,"_");} PYC;
+                                | PUT ID                {crear_terceto("PUT",$2,"_");} PYC;
+                                | PUT CTE_STRING        {crear_terceto("PUT",$2,"_");} PYC;   
+                                | PUT CTE_HEXA          //{crear_terceto("PUT",$2,"_");} PYC;
+                                | PUT CTE_REAL          //{crear_terceto("PUT",yyval.tipo_double,"_");} PYC;
+                                | PUT CTE_BIN           //{crear_terceto("PUT",$2,"_");} PYC;  
+
+get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n retorne get ->GET STRING PYC\n\n");};
 maximo              :           MAXIMO P_A lista P_C | MAXIMO P_A lista P_C PYC { printf("\n retorne maximo -> MAXIMO\n\n");};
-asignacion          :           ID OP_ASIG exp PYC { printf("\n retorne asignacion ->ID OP_ASIG exp PYC\n\n");};
+asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp PYC { 
+                                    itoa(Eind,EindString,10);
+                                    crear_terceto(":=",varID,EindString);
+                                    printf("\n retorne asignacion ->ID OP_ASIG exp PYC\n\n");
+                                };
 
 while:
     WHILE P_A condicion P_C L_A program L_C 
@@ -112,8 +140,9 @@ else:
 
 
 condicion_simple:
-    exp operador exp {printf("\nexp operador exp\n"); }
-;
+    exp 
+    operador 
+    exp 
 
 condicion:
     condicion_simple separador_logico condicion_simple {printf("\ncondicion_simple separador_logico condicion_simple\n"); }
@@ -126,27 +155,62 @@ separador_logico:
 ;
 
 operador: 
-    MAYOR {printf("\noperador mayor reconocido\n");}
-    | MENOR {printf("\noperador menor reconocido\n");}
-    | MAYOR_I | MENOR_I | OP_DIST | OP_IGUAL {printf("operador reconocido\n "); }
+    MAYOR       //{crear_terceto(BLE,"?","?");}
+    | MENOR     //{crear_terceto(BGE,"?","?");}
+    | MAYOR_I   //{crear_terceto(BLT,"?","?");}
+    | MENOR_I   //{crear_terceto(BGT,"?","?");}
+    | OP_DIST   //{crear_terceto(BEQ,"?","?");}
+    | OP_IGUAL  //{crear_terceto(BNE,"?","?");}
 ;
 
 exp:
-	term {printf("term\n "); }
-	|exp OP_SUM term { printf("exp OP_SUM term\n ");}
-	| exp OP_RES term { printf("exp OP_RES term\n ");}
+	exp OP_SUM term { 
+        itoa(Eind,EindString,10);
+        itoa(Tind,TindString,10);
+        //Eind=crear_terceto("+",EindString,TindString); 
+    }
+	| exp OP_RES term { 
+        itoa(Eind,EindString,10);
+        itoa(Tind,TindString,10);
+        //Eind=crear_terceto("-",EindString,TindString); 
+    }
+    | term { Eind=Tind; }
 
 	;
 term:
-	term OP_MUL factor { printf("regla multiplicacion es factor\n ");}
-	|term OP_DIV factor { printf("regla division es factor\n ");}
-	| factor { printf("regla termino es factor\n ");}
+	term OP_MUL factor { 
+        itoa(Tind,TindString,10);
+        itoa(Find,FindString,10);
+        //Tind=crear_terceto("*",TindString,FindString);
+    }
+	|term OP_DIV factor { 
+        itoa(Tind,TindString,10);
+        itoa(Find,FindString,10);
+        //Tind=crear_terceto("/",TindString,FindString);
+    }
+	| factor { Tind = Find;}
 	;
 
-factor: CTE |
-        ID { printf("\nID\n ");} | 
-        CTE_STRING | 
-        CTE_HEXA | CTE_REAL | CTE_BIN | P_A exp P_C | maximo { printf("\n retorne factor ->regla factor\n\n");};
+factor: CTE {  
+            itoa($1,varItoa,10);
+            strcpy(varString,"_");
+            strcat(varString, varItoa);
+            Find = crear_terceto(varString,"_","_");
+        };
+        | ID //{ Find = crear_terceto(yyval.tipo_string,"_","_");}; 
+        | CTE_STRING //{ Find = crear_terceto(yyval.tipo_string,"_","_");}; 
+        | CTE_HEXA { 
+            Find = crear_terceto($1,"_","_");
+        }; 
+        | CTE_REAL { 
+            sprintf(varString,"%.2f",$1);
+            strcpy(varReal,"_");
+            strcat(varReal, varString);
+            Find = crear_terceto(varReal,"_","_");
+        };
+        | CTE_BIN //{ Find = crear_terceto(yyval.tipo_string,"_","_");};
+        | P_A exp P_C 
+        | maximo { printf("\n retorne factor ->regla factor\n\n");};
 lista: 
      lista COMA exp
      |exp
@@ -191,6 +255,7 @@ int main(int argc, char *argv[]) {
             insertarEnTablaDeSimbolos(vecId[i], vecTipos[i], "CTE_STRING", 0, 0 );
         }
         guardarTablaDeSimbolos();
+        escribir_tercetos();
         if (tiposDIM != variablesDIM) {
             printf("Parse failed: error en la declaracion de dim no coinciden la cantidad de VARIABLES con la cantidad de TIPOS\n");
         };

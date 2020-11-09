@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "y.tab.h"
 FILE *yyin;
 char *yyltext;
