@@ -35,11 +35,23 @@ char varString[30];
 char varID[30];
 char varReal[30];
 
+//Auxiliar para maximo
+int aux = 0;
+int max = 0;
+int xind = 0;
+
+char auxString[10];
+char maxString[10];
+char despLista[10];
+
 //Pila
 
 Pila pilaExpresion;
-Pila pilaIf;
 Pila pilaTermino;
+Pila pilaFactor;
+Pila pilaIf;
+Pila pilaWhile;
+Pila pilaLista;
 
 
 typedef struct
@@ -115,9 +127,9 @@ program				:			sentencia { printf("\n Regla 0\n\n");}
 sentencia			: 		    put { printf("\n Regla 2\n\n");} 
                                 | get { printf("\n Regla 3\n\n");}
                                 | asignacion { printf("\n Regla 4\n\n");}
-                                | maximo { printf("\n Regla 5 \n\n");}
+                                | maximo PYC { printf("\n Regla 5 \n\n");} 
                                 | declaracion{ printf("\n Regla 6\n\n");}
-                                | while{ printf("\n Regla 7\n\n");}
+                                | while{printf("\n Regla 7\n\n");}
                                 | if { printf("\n Regla 8\n\n");};
 
 declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("\n Regla 9\n\n");};
@@ -149,20 +161,84 @@ put                 :           PUT CTE  			    {itoa($2,varItoa,10);
 ;
 get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n Regla 16\n\n");} ;
 
-maximo              :           MAXIMO P_A lista P_C { printf("\n Regla 63\n\n");}
-                                | MAXIMO P_A lista P_C PYC { printf("\n Regla 17\n\n");};
+maximo              :           MAXIMO P_A lista P_C { 
+                                    printf("\n Regla 17\n\n");
+                                };
+                                //| MAXIMO P_A lista P_C PYC { printf("\n Regla 17\n\n");};
 
-asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp PYC { 
+asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp { 
                                     int auxEind= desapilar(&pilaExpresion);
                                     itoa(auxEind,EindString,10);
-                                    crear_terceto(":=",varID,EindString);
+                                    crear_terceto(":",varID,EindString);
                                     printf("\n Regla 18\n\n");
-                                };
+                                } PYC; 
 
 while:
-    WHILE P_A condicion P_C L_A program L_C { printf("\n Regla 19\n\n");}
-    | WHILE P_A condicion P_C sentencia { printf("\n Regla 20\n\n");}
-;
+    WHILE {
+            apilar(&pilaWhile,obtenerIndiceTercetos());
+            crear_terceto("ET","_","_");
+        }
+        P_A condicion_simple P_C L_A program L_C { 
+            int biInd = crear_terceto("BI","_","_");
+            char valorActual[4];
+            int pivote=desapilar(&pilaIf);
+            itoa(obtenerIndiceTercetos(),valorActual,10);
+            strcpy(vector_tercetos[pivote].atr2,valorActual);
+            
+            pivote=desapilar(&pilaWhile);
+            itoa(pivote,valorActual,10);
+            strcpy(vector_tercetos[biInd].atr2,valorActual);
+            
+            printf("\n Regla 19\n\n");
+        }
+    | WHILE {
+            apilar(&pilaWhile,obtenerIndiceTercetos());
+            crear_terceto("ET","_","_");
+        } P_A condicion_simple P_C sentencia { 
+            int biInd = crear_terceto("BI","_","_");
+            char valorActual[4];
+            int pivote=desapilar(&pilaIf);
+            itoa(obtenerIndiceTercetos(),valorActual,10);
+            strcpy(vector_tercetos[pivote].atr2,valorActual);
+            
+            pivote=desapilar(&pilaWhile);
+            itoa(pivote,valorActual,10);
+            strcpy(vector_tercetos[biInd].atr2,valorActual);
+
+            printf("\n Regla 20\n\n");
+        };
+    /*| WHILE {
+            apilar(&pilaWhile,obtenerIndiceTercetos());
+            crear_terceto("ET","_","_");
+        } P_A condicion P_C L_A program L_C { 
+            int biInd = crear_terceto("BI","_","_");
+            char valorActual[4];
+            int pivote=desapilar(&pilaIf);
+            itoa(obtenerIndiceTercetos(),valorActual,10);
+            strcpy(vector_tercetos[pivote].atr2,valorActual);
+            
+            pivote=desapilar(&pilaWhile);
+            itoa(pivote,valorActual,10);
+            strcpy(vector_tercetos[biInd].atr2,valorActual);
+
+            printf("\n Regla 64\n\n");
+        }
+    | WHILE {
+            apilar(&pilaWhile,obtenerIndiceTercetos());
+            crear_terceto("ET","_","_");
+        } P_A condicion P_C sentencia { 
+            int biInd = crear_terceto("BI","_","_");
+            char valorActual[4];
+            int pivote=desapilar(&pilaIf);
+            itoa(obtenerIndiceTercetos(),valorActual,10);
+            strcpy(vector_tercetos[pivote].atr2,valorActual);
+            
+            pivote=desapilar(&pilaWhile);
+            itoa(pivote,valorActual,10);
+            strcpy(vector_tercetos[biInd].atr2,valorActual);
+
+            printf("\n Regla 65\n\n");
+        };*/
 
 if:
     IF P_A condicion_simple P_C L_A program L_C {
@@ -200,7 +276,7 @@ if:
     
     
     |
-IF P_A condicion P_C L_A program L_C {
+    IF P_A condicion P_C L_A program L_C {
                                         int bi=crear_terceto("BI","_","_");
                                         char valorActual[4];
                                         int pivote=desapilar(&pilaIf);
@@ -358,42 +434,46 @@ condicion:
 
 exp:
 	exp OP_SUM term { 
-        itoa(Eind,EindString,10);
-        itoa(Tind,TindString,10);
+        itoa(desapilar(&pilaExpresion),EindString,10);
+        itoa(desapilar(&pilaTermino),TindString,10);
         Eind=crear_terceto("+",EindString,TindString); 
         apilar(&pilaExpresion,Eind);
         printf("\n Regla 40\n\n");
     }
 	| exp OP_RES term { 
-        itoa(Eind,EindString,10);
-        itoa(Tind,TindString,10);
+        itoa(desapilar(&pilaExpresion),EindString,10);
+        itoa(desapilar(&pilaTermino),TindString,10);
         Eind=crear_terceto("-",EindString,TindString);
         apilar(&pilaExpresion,Eind) ;
         printf("\n Regla 41\n\n");
     }
-    | term { Eind=Tind; 
-      apilar(&pilaExpresion,Eind) ;
-      printf("\n Regla 42\n\n");}
+    | term { 
+        Eind=desapilar(&pilaTermino); 
+        apilar(&pilaExpresion,Eind) ;
+        printf("\n Regla 42\n\n");
+    }
 
 	;
 term:
 	term OP_MUL factor { 
-        itoa(Tind,TindString,10);
-        itoa(Find,FindString,10);
+        itoa(desapilar(&pilaTermino),TindString,10);
+        itoa(desapilar(&pilaFactor),FindString,10);
         Tind=crear_terceto("*",TindString,FindString);
         apilar(&pilaTermino,Tind) ;
         printf("\n Regla 43\n\n");
     }
 	|term OP_DIV factor { 
-        itoa(Tind,TindString,10);
-        itoa(Find,FindString,10);
+        itoa(desapilar(&pilaTermino),TindString,10);
+        itoa(desapilar(&pilaFactor),FindString,10);
         Tind=crear_terceto("/",TindString,FindString);
         apilar(&pilaTermino,Tind) ;
         printf("\n Regla 44\n\n");
     }
-	| factor { Tind = Find;
-    apilar(&pilaTermino,Tind) ;
-    printf("\n Regla 45\n\n");}
+	| factor {  
+        Tind = desapilar(&pilaFactor);
+        apilar(&pilaTermino,Tind) ;
+        printf("\n Regla 45\n\n");
+    }
 	;
 
 factor: CTE {  
@@ -401,38 +481,73 @@ factor: CTE {
             strcpy(varString,"_");
             strcat(varString, varItoa);
             Find = crear_terceto(varString,"_","_");
+            apilar(&pilaFactor,Find);
             printf("\n Regla 46\n\n");
         }
-        | ID { Find = crear_terceto($1,"_","_");
-                    printf("\n Regla 47\n\n");}
-        | CTE_STRING {Find = crear_terceto($1,"_","_");
-                    printf("\n Regla 48\n\n");} 
+        | ID { 
+            Find = crear_terceto($1,"_","_");
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 47\n\n");
+        }
+        | CTE_STRING {
+            Find = crear_terceto($1,"_","_");
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 48\n\n");
+        } 
 
         | CTE_HEXA { 
             Find = crear_terceto($1,"_","_");
+            apilar(&pilaFactor,Find);
             printf("\n Regla 49\n\n");
         } 
         | CTE_REAL { 
-            sprintf(varString,"%.2f",$1);
+            sprintf(varString,"%.3f",$1);
             strcpy(varReal,"_");
             strcat(varReal, varString);
             Find = crear_terceto(varReal,"_","_");
-             printf("\n Regla 50\n\n");
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 50\n\n");
         }
-        | CTE_BIN { Find = crear_terceto($1,"_","_");
-                 printf("\n Regla 51\n\n");}
+        | CTE_BIN { 
+            Find = crear_terceto($1,"_","_");
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 51\n\n");
+        }
 
-        | P_A exp P_C  { printf("\n Regla 52\n\n");}
+        | P_A exp P_C  { 
+            Find = desapilar(&pilaExpresion);
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 52\n\n");
+        }
 
-        | maximo { printf("\n Regla 53\n\n");}
+        | maximo { 
+            Find = crear_terceto("@max","_","_");
+            apilar(&pilaFactor,Find);
+            printf("\n Regla 53\n\n");}
         ;
 lista: 
+    exp
+     {  int d = desapilar(&pilaExpresion);
+        itoa(d,despLista,10);
+        crear_terceto(":", "@max", despLista);
+        printf("\n Regla 55\n\n");
+    }
+    |  
      lista COMA exp
-     { printf("\n Regla 54\n\n");}
-
-     |exp
-     { printf("\n Regla 55\n\n");}
-     ;
+     { 
+        int d = desapilar(&pilaExpresion);
+        itoa(d,despLista,10);
+        crear_terceto(":","@aux",despLista);
+        crear_terceto("CMP","@aux","@max");
+        xind = crear_terceto("BLE","_","_");
+        apilar(&pilaLista,xind);
+        crear_terceto(":","@max","@aux");
+        xind = desapilar(&pilaLista);
+        char valorActual[4];
+        itoa(obtenerIndiceTercetos(),valorActual,10);
+        strcpy(vector_tercetos[xind].atr2,valorActual);
+        printf("\n Regla 54\n\n");
+    };
 
 lista_tipos:
     lista_tipos COMA tipo { 

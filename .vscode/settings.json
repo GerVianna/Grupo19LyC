@@ -2,6 +2,7 @@
     "files.associations": {
         "*.y": "c",
         "locale": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "limits": "c"
     }
 }
