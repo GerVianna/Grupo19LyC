@@ -92,13 +92,13 @@ PYC     ";"
 {CTE_HEXA}  {
             yylval.tipo_string = yytext;
             validarString(yylval.tipo_string);
-            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_HEXA", yylval.tipo_string, 0, 0);
             return CTE_HEXA;
             }
 {CTE_BIN}   {
             yylval.tipo_string = yytext;
             validarString(yylval.tipo_string);
-            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_BIN", yylval.tipo_string, 0, 0);
             return CTE_BIN;
             }
 {CTE_REAL}  {

@@ -1,5 +1,6 @@
-#ifndef TERCETOS_H
-#define TERCETOS_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct terceto {
     int nroTerceto;
@@ -16,5 +17,3 @@ int obtenerIndiceTercetos();
 void setIndiceTercetos(int);
 
 static int indice_terceto = 0;
-
-#endif
