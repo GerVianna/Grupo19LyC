@@ -1,3 +1,6 @@
+#ifndef PILA_H
+#define PILA_H
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,3 +26,5 @@ int buscarEnPila(Pila *p, int v);
 Pila crearPila();
 void vaciarPila(Pila *p);
 int pilaVacia(Pila*p);
+
+#endif

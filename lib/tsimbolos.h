@@ -1,3 +1,6 @@
+#ifndef TSIMBOLOS_H
+#define TSIMBOLOS_H
+
 #include <string.h>
 #include <stdio.h>
 
@@ -36,3 +39,5 @@ int insertarEnTablaDeSimbolos(const char *, const char *, const char*, int, doub
 void guardarTablaDeSimbolos();
 
 t_nodo * getLexema(const char *);
+
+#endif

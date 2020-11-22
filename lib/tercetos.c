@@ -27,6 +27,22 @@ void escribir_tercetos()
 	fclose(arch);
 }
 
+void escribir_tercetosAssembler()
+{
+	FILE* arch;
+	int i;
+	terceto aux;
+	arch = fopen("intermediaASM.txt", "w+");
+   
+	for(i = 0; i < indice_terceto; i++)
+	{	
+		aux =  vector_tercetos[i];
+		fprintf(arch, "[%d] (%s,%s,%s)\n", aux.nroTerceto, aux.atr1,aux.atr2, aux.atr3);
+		
+	}
+	fclose(arch);
+}
+
 int obtenerIndiceTercetos()
 {
    return indice_terceto;

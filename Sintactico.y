@@ -7,6 +7,7 @@
 #include "lib/tercetos.c"
 #include "lib/pila.c"
 #include "lib/tsimbolos.c"
+#include "lib/assembler.c"
 
 // #include "tablasimbolos.c"
 int yystopparser = 0;
@@ -172,7 +173,7 @@ while:
             crear_terceto("ET","_","_");
         }
         P_A condicion_simple P_C L_A program L_C { 
-            int biInd = crear_terceto("BI","_","_");
+            int biInd = crear_terceto("JMP","_","_");
             char valorActual[4];
             int pivote=desapilar(&pilaIf);
             itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -188,7 +189,7 @@ while:
             apilar(&pilaWhile,obtenerIndiceTercetos());
             crear_terceto("ET","_","_");
         } P_A condicion_simple P_C sentencia { 
-            int biInd = crear_terceto("BI","_","_");
+            int biInd = crear_terceto("JMP","_","_");
             char valorActual[4];
             int pivote=desapilar(&pilaIf);
             itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -204,7 +205,7 @@ while:
             apilar(&pilaWhile,obtenerIndiceTercetos());
             crear_terceto("ET","_","_");
         } P_A condicion P_C L_A program L_C { 
-            int biInd = crear_terceto("BI","_","_");
+            int biInd = crear_terceto("JMP","_","_");
             char valorActual[4];
             int pivote=desapilar(&pilaIf);
             itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -220,7 +221,7 @@ while:
             apilar(&pilaWhile,obtenerIndiceTercetos());
             crear_terceto("ET","_","_");
         } P_A condicion P_C sentencia { 
-            int biInd = crear_terceto("BI","_","_");
+            int biInd = crear_terceto("JMP","_","_");
             char valorActual[4];
             int pivote=desapilar(&pilaIf);
             itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -235,7 +236,7 @@ while:
 
 if:
     IF P_A condicion_simple P_C L_A program L_C {
-                                        int bi=crear_terceto("BI","_","_");
+                                        int bi=crear_terceto("JMP","_","_");
                                         char valorActual[4];
                                         int pivote=desapilar(&pilaIf);
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -245,7 +246,7 @@ if:
 
 
     | IF P_A condicion_simple P_C sentencia {
-                                        int bi=crear_terceto("BI","_","_");
+                                        int bi=crear_terceto("JMP","_","_");
                                         char valorActual[4];
                                         int pivote=desapilar(&pilaIf);
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -270,7 +271,7 @@ if:
                                     }   
     |
     IF P_A condicion P_C L_A program L_C {
-                                        int bi=crear_terceto("BI","_","_");
+                                        int bi=crear_terceto("JMP","_","_");
                                         char valorActual[4];
                                         int pivote=desapilar(&pilaIf);
                                         int tercetoActual=obtenerIndiceTercetos();
@@ -287,7 +288,7 @@ if:
 
 
     | IF P_A condicion P_C sentencia {
-                                        int bi=crear_terceto("BI","_","_");
+                                        int bi=crear_terceto("JMP","_","_");
                                         char valorActual[4];
                                         int pivote=desapilar(&pilaIf);
                                         int tercetoActual=obtenerIndiceTercetos();
@@ -359,9 +360,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BGE","_","_");
+                    int numTerceto=crear_terceto("JAE","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BLT");
                     printf("\n Regla 31\n\n");}
 
         |
@@ -371,9 +371,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BLE","_","_");
+                    int numTerceto=crear_terceto("JNA","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BGT");
                     printf("\n Regla 32\n\n");}
                     
         |   exp MENOR_I exp {
@@ -382,9 +381,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BGT","_","_");
+                    int numTerceto=crear_terceto("JA","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BLE");
                     printf("\n Regla 33\n\n");
         } 
 
@@ -394,9 +392,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BLT","_","_");
+                    int numTerceto=crear_terceto("JNAE","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BGE");
                     printf("\n Regla 34\n\n");
         }
 
@@ -406,9 +403,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BNE","_","_");
+                    int numTerceto=crear_terceto("JNE","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BEQ");
                     printf("\n Regla 35\n\n");
         }
 
@@ -418,9 +414,8 @@ condicion_simple:
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
-                    int numTerceto=crear_terceto("BEQ","_","_");
+                    int numTerceto=crear_terceto("JE","_","_");
                     apilar(&pilaIf,numTerceto);
-                    strcpy(oper,"BNE");
                     printf("\n Regla 36\n\n");
                           
         }       
@@ -429,7 +424,7 @@ condicion_simple:
 condicion:
     condicion_simple SEP_AND condicion_simple { printf("\n Regla 37\n\n");}
     | condicion_simple SEP_OR {
-            int num = crear_terceto(oper,"_","_");
+            int num = crear_terceto("JMP","_","_");
             char valorActual[4];
             int pivote = desapilar(&pilaIf);
             int tercetoActual=obtenerIndiceTercetos();
@@ -573,7 +568,7 @@ lista:
         itoa(d,despLista,10);
         crear_terceto(":","@aux",despLista);
         crear_terceto("CMP","@aux","@max");
-        xind = crear_terceto("BLE","_","_");
+        xind = crear_terceto("JNA","_","_");
         apilar(&pilaLista,xind);
         crear_terceto(":","@max","@aux");
         xind = desapilar(&pilaLista);
@@ -629,6 +624,8 @@ int main(int argc, char *argv[]) {
         yyparse();
         guardarTablaDeSimbolos();
         escribir_tercetos();
+        preparar_assembler();
+        escribir_tercetosAssembler();
         if (tiposDIM != variablesDIM) {
             printf("Parse failed: error en la declaracion de dim no coinciden la cantidad de VARIABLES con la cantidad de TIPOS\n");
         };
