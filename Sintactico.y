@@ -57,6 +57,10 @@ char auxString[10];
 char maxString[10];
 char despLista[10];
 
+//Operacion
+char oper[4];
+int isOR = 0;
+
 //Pila
 Pila pilaExpresion;
 Pila pilaTermino;
@@ -237,7 +241,7 @@ if:
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                         apilar(&pilaIf,bi);
-                                        }else { printf("\n Regla 21 \n\n");}
+                                    } else { printf("\n Regla 21 \n\n");}
 
 
     | IF P_A condicion_simple P_C sentencia {
@@ -247,23 +251,23 @@ if:
                                         itoa(obtenerIndiceTercetos(),valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                         apilar(&pilaIf,bi);
-                                        }else { printf("\n Regla 22\n\n");}
+                                    } else { printf("\n Regla 22\n\n");}
 
     | IF P_A condicion_simple P_C L_A program L_C{
-                        char valorActual[4];
-                        int pivote = desapilar(&pilaIf);
-                           itoa(obtenerIndiceTercetos(),valorActual,10);
-                            strcpy(vector_tercetos[pivote].atr2,valorActual);
-                            printf("\n Regla 23\n\n");}
+                                        char valorActual[4];
+                                        int pivote = desapilar(&pilaIf);
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                        printf("\n Regla 23\n\n");
+                                    }
 
     | IF P_A condicion_simple P_C sentencia{
-                        char valorActual[4];
-                        int pivote = desapilar(&pilaIf);
-                           itoa(obtenerIndiceTercetos(),valorActual,10);
-                            strcpy(vector_tercetos[pivote].atr2,valorActual);
-                             printf("\n Regla 24\n\n");}
-    
-    
+                                        char valorActual[4];
+                                        int pivote = desapilar(&pilaIf);
+                                        itoa(obtenerIndiceTercetos(),valorActual,10);
+                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                        printf("\n Regla 24\n\n");
+                                    }   
     |
     IF P_A condicion P_C L_A program L_C {
                                         int bi=crear_terceto("BI","_","_");
@@ -272,10 +276,14 @@ if:
                                         int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         pivote=desapilar(&pilaIf);
+                                        if(isOR == 1) {
+                                            itoa(pivote+1,valorActual,10);
+                                            isOR = 0;
+                                        }
+                                        pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         apilar(&pilaIf,bi);
-                                        }else { printf("\n Regla 25\n\n");}
+                                        apilar(&pilaIf,bi);
+                                    } else { printf("\n Regla 25\n\n");}
 
 
     | IF P_A condicion P_C sentencia {
@@ -285,10 +293,14 @@ if:
                                         int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         pivote=desapilar(&pilaIf);
+                                        if(isOR == 1) {
+                                            itoa(pivote+1,valorActual,10);
+                                            isOR = 0;
+                                        }
+                                        pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         apilar(&pilaIf,bi);
-                                        }else { printf("\n Regla 26\n\n");}
+                                        apilar(&pilaIf,bi);
+                                    } else { printf("\n Regla 26\n\n");}
 
     | IF P_A condicion P_C L_A program L_C{
                                         char valorActual[4];
@@ -296,53 +308,64 @@ if:
                                         int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
+                                        if(isOR == 1) {
+                                            itoa(pivote+1,valorActual,10);
+                                            isOR = 0;
+                                        }
                                         pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                        printf("\n Regla 27\n\n");}
-
+                                        printf("\n Regla 27\n\n");
+                                    }
     | IF P_A condicion P_C sentencia{
                                         char valorActual[4];
                                         int pivote = desapilar(&pilaIf);
                                         int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         pivote=desapilar(&pilaIf);
+                                        if(isOR == 1) {
+                                            itoa(pivote+1,valorActual,10);
+                                            isOR = 0;
+                                        }
+                                        pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         printf("\n Regla 28\n\n");}
+                                        printf("\n Regla 28\n\n");
+                                    }
 
 
 ;
 
 else:
-    ELSE L_A program L_C{int pivote=desapilar(&pilaIf);
+    ELSE L_A program L_C{   int pivote=desapilar(&pilaIf);
                             char valorActual[4];
-                                        itoa(obtenerIndiceTercetos(),valorActual,10);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         printf("\n Regla 29 \n\n");}
-    | ELSE sentencia{int pivote=desapilar(&pilaIf);
+                            itoa(obtenerIndiceTercetos(),valorActual,10);
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);
+                            printf("\n Regla 29 \n\n");
+                        }
+    | ELSE sentencia{       int pivote=desapilar(&pilaIf);
                             char valorActual[4];
-                                        itoa(obtenerIndiceTercetos(),valorActual,10);
-                                        strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         printf("\n Regla 30\n\n");}
+                            itoa(obtenerIndiceTercetos(),valorActual,10);
+                            strcpy(vector_tercetos[pivote].atr2,valorActual);
+                            printf("\n Regla 30\n\n");
+                    }
 ;
 
 
 
 
 condicion_simple:
-             exp MENOR exp {
+            exp MENOR exp {
                     char auxEind1[4];
-
                     itoa(desapilar(&pilaExpresion),auxEind1,10);
                     char auxEind2[4];
                     itoa(desapilar(&pilaExpresion),auxEind2,10);
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BGE","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BLT");
                     printf("\n Regla 31\n\n");}
 
         |
-             exp MAYOR exp {
+            exp MAYOR exp {
                     char auxEind1[4];
                     itoa(desapilar(&pilaExpresion),auxEind1,10);
                     char auxEind2[4];
@@ -350,6 +373,7 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BLE","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BGT");
                     printf("\n Regla 32\n\n");}
                     
         |   exp MENOR_I exp {
@@ -360,6 +384,7 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BGT","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BLE");
                     printf("\n Regla 33\n\n");
         } 
 
@@ -371,6 +396,7 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BLT","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BGE");
                     printf("\n Regla 34\n\n");
         }
 
@@ -382,6 +408,7 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BNE","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BEQ");
                     printf("\n Regla 35\n\n");
         }
 
@@ -393,32 +420,25 @@ condicion_simple:
                     crear_terceto("CMP",auxEind2,auxEind1);
                     int numTerceto=crear_terceto("BEQ","_","_");
                     apilar(&pilaIf,numTerceto);
+                    strcpy(oper,"BNE");
                     printf("\n Regla 36\n\n");
                           
         }       
-                    ;
+;
 
 condicion:
     condicion_simple SEP_AND condicion_simple { printf("\n Regla 37\n\n");}
-    | condicion_simple SEP_OR condicion_simple { printf("\n Regla 38\n\n");}
-// |condicion_simple SEP_NOT condicion_simple { printf("\n Regla 39\n\n");}
-
-    //| condicion_simple {printf("\ncondicion_simple\n"); }
+    | condicion_simple SEP_OR {
+            int num = crear_terceto(oper,"_","_");
+            char valorActual[4];
+            int pivote = desapilar(&pilaIf);
+            int tercetoActual=obtenerIndiceTercetos();
+            itoa(tercetoActual,valorActual,10);
+            strcpy(vector_tercetos[pivote].atr2,valorActual);
+            isOR = 1;
+            apilar(&pilaIf, num);
+        } condicion_simple { printf("\n Regla 38\n\n");}
 ;
-/*separador_logico:
-    SEP_AND {printf("\nSEP_AND\n"); }
-    | SEP_OR {printf("\n SEP_OR\n");}
-    | SEP_NOT {printf("\n SEP_NOT\n");}
-;*/
-
-/*operador: 
-    MAYOR       //{crear_terceto(BLE,"?","?");}
-    | MENOR     //{crear_terceto(BGE,"?","?");}
-    | MAYOR_I   //{crear_terceto(BLT,"?","?");}
-    | MENOR_I   //{crear_terceto(BGT,"?","?");}
-    | OP_DIST   //{crear_terceto(BEQ,"?","?");}
-    | OP_IGUAL  //{crear_terceto(BNE,"?","?");}
-;*/
 
 exp:
 	exp OP_SUM term { 
