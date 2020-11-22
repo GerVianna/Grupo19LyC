@@ -1,21 +1,7 @@
 NOMBRE                        TIPO                          VALOR                         LONGITUD                      
-_"Prueba.txt LyC Tema 2!"                                   "Prueba.txt LyC Tema 2!"      24
-_"Ingrese un valor entero: "                                "Ingrese un valor entero: "   27
-_0                            CTE                           0                             
-_2.5                          CTE_REAL                      2.5                           
-_0xA2B0                       CTE_HEXA                      0xA2B0                        
-_9                            CTE                           9                             
-_1                            CTE                           1                             
-_0.342                        CTE_REAL                      0.342                         
-_2                            CTE                           2                             
-_4                            CTE                           4                             
-_0b110                        CTE_BIN                       0b110                         
-_"La suma es: "                                             "La suma es: "                14
-_0b10                         CTE_BIN                       0b10                          
-_"actual es mayor que 2"                                    "actual es mayor que 2"       23
-_0b111010                     CTE_BIN                       0b111010                      
-_"no es mayor que 2"                                        "no es mayor que 2"           19
-contador                      Integer                       --                            
-promedio                      Float                         --                            
 actual                        Float                         --                            
 suma                          Float                         --                            
+pivot                         Float                         --                            
+_0b10                         CTE_BIN                       0b10                          
+_0                            CTE                           0                             
+_"actual es mayor que 2"ã     CTE_STRING                    "actual es mayor que 2"       23

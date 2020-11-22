@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "y.tab.h"
 #include "lib/tercetos.c"
 #include "lib/pila.c"
@@ -13,12 +14,18 @@ int variablesDIM = 0;
 int tiposDIM = 0;
 char vecId [50][32];
 char vecTipos [50][32];
+int cantExpr = -1;
 
 FILE *yyin;
 
 int yyerror();
 int yylex();
-bool verificarAsignacion(const char*, const char*);
+void guardarAsignacion(const char*);
+int yyerrorAsig(const char*);
+
+void crearPilas();
+bool verificarAsignacion(const char*);
+bool esCompatible(const char*, const char*);
 
 
 //Indices para tercetos
@@ -42,12 +49,15 @@ int aux = 0;
 int max = 0;
 int xind = 0;
 
+//Validar asignaciones
+int esAsig = 0;
+char vecAsignacion[30][50];
+
 char auxString[10];
 char maxString[10];
 char despLista[10];
 
 //Pila
-
 Pila pilaExpresion;
 Pila pilaTermino;
 Pila pilaFactor;
@@ -99,7 +109,13 @@ sentencia			: 		    put { printf("\n Regla 2\n\n");}
                                 | while{printf("\n Regla 7\n\n");}
                                 | if { printf("\n Regla 8\n\n");};
 
-declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { printf("\n Regla 9\n\n");};
+declaracion         :           DIM MENOR lista_id MAYOR AS MENOR lista_tipos MAYOR { 
+                                    int i = 0;
+                                    for(i = 0; i < variablesDIM; i++) {
+                                        insertarEnTablaDeSimbolos(vecId[i], vecTipos[i], "CTE_STRING", 0, 0 );
+                                    }
+                                    printf("\n Regla 9\n\n");
+                                };
 
 put                 :           PUT CTE  			    {itoa($2,varItoa,10);
                                                          strcpy(varString,"_");
@@ -133,11 +149,17 @@ maximo              :           MAXIMO P_A lista P_C {
                                 };
                                 //| MAXIMO P_A lista P_C PYC { printf("\n Regla 17\n\n");};
 
-asignacion          :           ID {strcpy(varID,$1);} OP_ASIG exp { 
+asignacion          :           ID {strcpy(varID,$1);} OP_ASIG {esAsig = 1;} exp { 
+                                    printf("\n Regla 18\n\n");
+                                    if(!verificarAsignacion(varID)) {
+                                        yyerrorAsig(varID);
+                                    }
                                     int auxEind= desapilar(&pilaExpresion);
                                     itoa(auxEind,EindString,10);
                                     crear_terceto(":",varID,EindString);
-                                    printf("\n Regla 18\n\n");
+
+                                    cantExpr = -1;
+                                    esAsig = 0;
                                 } PYC; 
 
 while:
@@ -269,19 +291,19 @@ if:
                                         }else { printf("\n Regla 26\n\n");}
 
     | IF P_A condicion P_C L_A program L_C{
-                        char valorActual[4];
-                        int pivote = desapilar(&pilaIf);
-                           int tercetoActual=obtenerIndiceTercetos();
+                                        char valorActual[4];
+                                        int pivote = desapilar(&pilaIf);
+                                        int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         pivote=desapilar(&pilaIf);
+                                        pivote=desapilar(&pilaIf);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
-                                         printf("\n Regla 27\n\n");}
+                                        printf("\n Regla 27\n\n");}
 
     | IF P_A condicion P_C sentencia{
-                        char valorActual[4];
-                        int pivote = desapilar(&pilaIf);
-                          int tercetoActual=obtenerIndiceTercetos();
+                                        char valorActual[4];
+                                        int pivote = desapilar(&pilaIf);
+                                        int tercetoActual=obtenerIndiceTercetos();
                                         itoa(tercetoActual,valorActual,10);
                                         strcpy(vector_tercetos[pivote].atr2,valorActual);
                                          pivote=desapilar(&pilaIf);
@@ -378,8 +400,7 @@ condicion_simple:
 
 condicion:
     condicion_simple SEP_AND condicion_simple { printf("\n Regla 37\n\n");}
-
-// | condicion_simple SEP_OR condicion_simple { printf("\n Regla 38\n\n");}
+    | condicion_simple SEP_OR condicion_simple { printf("\n Regla 38\n\n");}
 // |condicion_simple SEP_NOT condicion_simple { printf("\n Regla 39\n\n");}
 
     //| condicion_simple {printf("\ncondicion_simple\n"); }
@@ -449,35 +470,61 @@ factor: CTE {
             strcat(varString, varItoa);
             Find = crear_terceto(varString,"_","_");
             apilar(&pilaFactor,Find);
+            if(esAsig == 1) {
+                guardarAsignacion(varString);
+            }
             printf("\n Regla 46\n\n");
         }
         | ID { 
             Find = crear_terceto($1,"_","_");
             apilar(&pilaFactor,Find);
+            if(esAsig == 1) {
+                guardarAsignacion($1);
+            }
             printf("\n Regla 47\n\n");
         }
         | CTE_STRING {
             Find = crear_terceto($1,"_","_");
             apilar(&pilaFactor,Find);
+            strcpy(varString,"_");
+            strcat(varString, $1);
+            
+            if(esAsig == 1) {
+                guardarAsignacion(varString);
+            }
             printf("\n Regla 48\n\n");
         } 
 
         | CTE_HEXA { 
             Find = crear_terceto($1,"_","_");
             apilar(&pilaFactor,Find);
+            strcpy(varString,"_");
+            strcat(varString, $1);
+            
+            if(esAsig == 1) {
+                guardarAsignacion(varString);
+            }
             printf("\n Regla 49\n\n");
         } 
         | CTE_REAL { 
-            sprintf(varString,"%.3f",$1);
+            sprintf(varString,"%g",$1);
             strcpy(varReal,"_");
             strcat(varReal, varString);
             Find = crear_terceto(varReal,"_","_");
             apilar(&pilaFactor,Find);
+            if(esAsig == 1) {
+                guardarAsignacion(varReal);
+            }
             printf("\n Regla 50\n\n");
         }
         | CTE_BIN { 
             Find = crear_terceto($1,"_","_");
             apilar(&pilaFactor,Find);
+            strcpy(varString,"_");
+            strcat(varString, $1);
+            if(esAsig == 1) {
+                guardarAsignacion(varString);
+            }
             printf("\n Regla 51\n\n");
         }
 
@@ -557,15 +604,9 @@ int main(int argc, char *argv[]) {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
     }
     else {
-        pilaExpresion = crearPila();
-        pilaIf = crearPila();
-        pilaTermino = crearPila();
+        crearPilas();
         crearTablaSimbolos();
         yyparse();
-		int i = 0;
-        for(i = 0; i < variablesDIM; i++) {
-            insertarEnTablaDeSimbolos(vecId[i], vecTipos[i], "CTE_STRING", 0, 0 );
-        }
         guardarTablaDeSimbolos();
         escribir_tercetos();
         if (tiposDIM != variablesDIM) {
@@ -581,9 +622,51 @@ int yyerror(void) {
     exit(1);
 }
 
-bool verificarAsignacion(const char* a, const char* b) {
-    t_nodo* li = getLexema(a);
-    t_nodo* ld = getLexema(b);
+bool verificarAsignacion(const char* id) {
+    t_nodo* lexi = getLexema(id);
+    t_nodo* lexd;
+    int i;
+    for(i = 0; i<=cantExpr; i++){
+        lexd = getLexema(vecAsignacion[i]);
+        if(!esCompatible(lexi->data.tipo, lexd->data.tipo)) {
+            return false;
+        }
+    }
+    return true;
+}
 
-    return strcmp(li->data.tipo, ld->data.tipo) == 0;
+
+bool esCompatible(const char* tipo1, const char* tipo2)
+{
+    if(strcmp("Integer", tipo1) == 0){
+        return (strcmp("Integer", tipo2) == 0 || strcmp("CTE", tipo2) == 0 
+            || strcmp("CTE_HEXA", tipo2) == 0 || strcmp("CTE_BIN", tipo2) == 0);
+    }
+    else if(strcmp("Float", tipo1) == 0){
+        return (strcmp("Float", tipo2) == 0 || strcmp("CTE", tipo2) == 0 || strcmp("CTE_REAL", tipo2) == 0 
+            || strcmp("CTE_HEXA", tipo2) == 0 || strcmp("CTE_BIN", tipo2) == 0 || strcmp("Integer", tipo2) == 0);
+    }
+    else if(strcmp("String", tipo1) == 0){
+        return (strcmp("String", tipo2) == 0 || strcmp("CTE_STRING", tipo2) == 0);
+    }
+}
+
+
+void crearPilas() {
+    pilaExpresion = crearPila();
+    pilaTermino = crearPila();
+    pilaFactor = crearPila();
+    pilaIf = crearPila();
+    pilaWhile = crearPila();
+    pilaLista = crearPila();
+}
+
+int yyerrorAsig(const char* id) {
+    printf("\nError: se hacen asignaciones de distinto tipo de datos para el id: %s", id);
+    exit(1);
+}
+
+void guardarAsignacion(const char* id){
+    cantExpr++;
+    strcpy(vecAsignacion[cantExpr], id);
 }

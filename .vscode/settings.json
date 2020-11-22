@@ -3,6 +3,7 @@
         "*.y": "c",
         "locale": "c",
         "ostream": "c",
-        "limits": "c"
+        "limits": "c",
+        "cmath": "c"
     }
 }

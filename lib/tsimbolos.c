@@ -154,7 +154,7 @@ void guardarTablaDeSimbolos()
         }
         else if(strcmp(aux->data.tipo, "CTE_STRING") == 0)
         {
-            sprintf(linea, "%-30s%-30s%-30s%d\n", aux->data.nombre, "", aux->data.valor.valor_string, aux->data.longitud);
+            sprintf(linea, "%-30s%-30s%-30s%d\n", aux->data.nombre, aux->data.tipo, aux->data.valor.valor_string, aux->data.longitud);
         }
         else if(strcmp(aux->data.tipo, "CTE_HEXA") == 0 || strcmp(aux->data.tipo, "CTE_BIN") == 0) 
         {
@@ -171,26 +171,20 @@ t_nodo * getLexema(const char *valor){
     t_nodo *lexema;
     t_nodo *tablaSimb = tablaSimbolos.primero;
 
-    char nombreLimpio[32];
-    char nombreCTE[32] = "_";
-    strcat(nombreCTE, nombreLimpio);
-    int esID;
-    int esCTE;
+    //int esID = -1;
+    //int esCTE = -1;
     //int esASM;
     int encontro = -1;
-    char valorFloat[32];
 
-    while(tablaSimb){  
-        esID = strcmp(tablaSimb->data.nombre, nombreLimpio);
-        esCTE = strcmp(tablaSimb->data.nombre, nombreCTE);
+    while(tablaSimb){ 
+        encontro = strcmp(tablaSimb->data.nombre, valor);
         //esASM = strcmp(tablaSimb->data.nombreASM, valor);
-
-        if(strcmp(tablaSimb->data.tipo, "CONST_STR") == 0)
+        /*if(strcmp(tablaSimb->data.tipo, "CONST_STR") == 0)
         {
             encontro = strcmp(valor, tablaSimb->data.valor.valor_string);
-        }
+        }*/
 
-        if(esID == 0 || esCTE == 0) //|| esASM == 0 || esValor == 0)
+        if(encontro == 0) //|| esASM == 0 || esValor == 0)
         { 
             lexema = tablaSimb;
             return lexema;
