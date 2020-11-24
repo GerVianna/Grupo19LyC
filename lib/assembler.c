@@ -8,8 +8,10 @@
 #include "tercetos.h"
 #include "const.h"
 #include "tsimbolos.h"
+#include "util.h"
 
 char bufferaux1[20];
+char auxS[100];
 int yyerror();
 int esOperacion(int);
 
@@ -25,7 +27,7 @@ void preparar_assembler()
 	{
 
         if(strcmp(vector_tercetos[i].atr1,"ET")==0) {
-            printf("entre aca con i: %d\n", i);
+            //printf("entre aca con i: %d\n", i);
             vector_tercetos[i].esEtiqueta = 1;
         }
 
@@ -34,6 +36,7 @@ void preparar_assembler()
 			for(j=i+1;j< indice_terceto;j++)
 			{
 				itoa(i,bufferaux1,10);
+                
 				if(strcmp(vector_tercetos[j].atr2,bufferaux1)==0)
 				{
 					strcpy(vector_tercetos[j].atr2,vector_tercetos[i].atr1);
@@ -47,12 +50,12 @@ void preparar_assembler()
 
         if(esSalto(i))
 		{	
-            printf("Entre con i:%d\n",i);
+            //printf("Entre con i:%d\n",i);
 			entero_aux = atoi(vector_tercetos[i].atr2);
-            printf("Entero Aux:%d\n",entero_aux);
+            //printf("Entero Aux:%d\n",entero_aux);
 			vector_tercetos[entero_aux].esEtiqueta = 1;
 			strcat(etiqueta,vector_tercetos[i].atr2);
-            printf("Etiqueta:%s\n",etiqueta);
+            //printf("Etiqueta:%s\n",etiqueta);
 			strcpy(vector_tercetos[i].atr2,etiqueta);
 			strcpy(etiqueta,"etiqueta_");
 		}
@@ -202,16 +205,31 @@ void escribir_seccion_datos(FILE *archivoAssembler) {
         else if(strcmp(aux->data.tipo, "CTE_REAL") == 0)
         {
             sprintf(valorAux,"%g",aux->data.valor.valor_double);
+            replace_char(aux->data.nombre,'.', '_');
             sprintf(linea, "%s dd %s\n", aux->data.nombre, valorAux);         
         }
         else if(strcmp(aux->data.tipo, "CTE_STRING") == 0)
         {
             strcpy(valorAux,aux->data.valor.valor_string);
-            sprintf(linea, "%s db %s '$', %d dup (?)\n", aux->data.nombre, valorAux, aux->data.longitud);         
+            removeChar(aux->data.nombre,'!');
+            removeChar(aux->data.nombre,':');
+            removeChar(aux->data.nombre,'\"');
+            replace_char(aux->data.nombre,'.', '_');
+            replace_char(aux->data.nombre,' ', '_');
+            sprintf(linea, "%s db %s , '$', %d dup (?)\n", aux->data.nombre, valorAux, aux->data.longitud);         
         }
-        else if(strcmp(aux->data.tipo, "CTE_HEXA") == 0 || strcmp(aux->data.tipo, "CTE_BIN") == 0) 
+        else if(strcmp(aux->data.tipo, "CTE_HEXA") == 0) 
         {
             strcpy(valorAux,aux->data.valor.valor_string);
+            quitarCaracter(valorAux,'x');
+            strcat(valorAux,"h");
+            sprintf(linea, "%s dd %s\n", aux->data.nombre, valorAux);        
+        }
+        else if(strcmp(aux->data.tipo, "CTE_BIN") == 0) 
+        {
+            strcpy(valorAux,aux->data.valor.valor_string);
+            quitarCaracter(valorAux,'b');
+            strcat(valorAux,"b");
             sprintf(linea, "%s dd %s\n", aux->data.nombre, valorAux);        
         }
         else if(strcmp(aux->data.tipo, "auxCode") == 0)
@@ -262,7 +280,7 @@ void escribir_seccion_codigo(FILE *archivoAssembler)
                 break;
                 
             case 6:
-                fprintf(archivoAssembler,"mov dx,OFFSET %s\nmov ah,9\nint21h\nnewline 1\n\n", vector_tercetos[i].atr2);
+                fprintf(archivoAssembler,"mov dx,OFFSET %s\nmov ah,9\nint 21h\nnewline 1\n\n", vector_tercetos[i].atr2);
                 break;
                 
             case 7: //GET por consola

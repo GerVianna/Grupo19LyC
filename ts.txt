@@ -20,6 +20,7 @@ _2                            CTE                           2
 @aux35                                                      --                            
 _4                            CTE                           4                             
 _0b110                        CTE_BIN                       0b110                         
+@aux                                                        --                            
 @max2                                                       --                            
 @max1                                                       --                            
 @aux58                                                      --                            

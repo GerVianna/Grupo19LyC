@@ -11,32 +11,33 @@ promedio dd ?
 actual dd ?
 suma dd ?
 pivot dd ?
-_"Prueba.txt LyC Tema 2!" db "Prueba.txt LyC Tema 2!" '$', 24 dup (?)
-_"Ingrese un valor entero: " db "Ingrese un valor entero: " '$', 27 dup (?)
+_Prueba_txt_LyC_Tema_2 db "Prueba.txt LyC Tema 2!" , '$', 24 dup (?)
+_Ingrese_un_valor_entero_ db "Ingrese un valor entero: " , '$', 27 dup (?)
 _0 dd 0.0
-_2.5 dd 2.5
-_0xA2B0 dd 0xA2B0
+_2_5 dd 2.5
+_0xA2B0 dd 0A2B0h
 @aux7 dd ?
 _9 dd 9.0
 _1 dd 1.0
 @aux18 dd ?
-_0.342 dd 0.342
+_0_342 dd 0.342
 @aux22 dd ?
 @aux26 dd ?
 _2 dd 2.0
 @aux35 dd ?
 _4 dd 4.0
-_0b110 dd 0b110
+_0b110 dd 0110b
+@aux dd ?
 @max2 dd ?
 @max1 dd ?
 @aux58 dd ?
 @aux59 dd ?
 @aux63 dd ?
-_"La suma es: " db "La suma es: " '$', 14 dup (?)
-_0b10 dd 0b10
-_"actual es mayor que 2" db "actual es mayor que 2" '$', 23 dup (?)
-_0b111010 dd 0b111010
-_"no es mayor que 2" db "no es mayor que 2" '$', 19 dup (?)
+_La_suma_es_ db "La suma es: " , '$', 14 dup (?)
+_0b10 dd 010b
+_actual_es_mayor_que_2 db "actual es mayor que 2" , '$', 23 dup (?)
+_0b111010 dd 0111010b
+_no_es_mayor_que_2 db "no es mayor que 2" , '$', 19 dup (?)
 
 .CODE
 
@@ -46,14 +47,14 @@ MOV AX,@DATA
 MOV DS, AX
 MOV ES, AX
 
-mov dx,OFFSET _"Prueba.txt LyC Tema 2!"
+mov dx,OFFSET _Prueba_txt_LyC_Tema_2
 mov ah,9
-int21h
+int 21h
 newline 1
 
-mov dx,OFFSET _"Ingrese un valor entero: "
+mov dx,OFFSET _Ingrese_un_valor_entero_
 mov ah,9
-int21h
+int 21h
 newline 1
 
 DisplayString @msg 
@@ -64,7 +65,7 @@ GetFloat actual
 fld _0
 fstp contador
 fld _2.5
-fld 0xA2B0
+fld _0xA2B0
 fadd
 fstp @aux7
 fld @aux7
@@ -145,7 +146,7 @@ fld @aux
 fstp @max2
 
 etiqueta_47:
-fld 0b110
+fld _0b110
 fstp @aux
 fld @aux
 fld @max2
@@ -195,18 +196,18 @@ JMP etiqueta_11
 
 
 etiqueta_66:
-mov dx,OFFSET _"La suma es: "
+mov dx,OFFSET _La_suma_es_
 mov ah,9
-int21h
+int 21h
 newline 1
 
-mov dx,OFFSET _suma
+mov dx,OFFSET suma
 mov ah,9
-int21h
+int 21h
 newline 1
 
 fld actual
-fld 0b10
+fld _0b10
 fxch
 fcomp
 fstsw ax
@@ -221,9 +222,9 @@ fstsw ax
 sahf
 JE etiqueta_78
 
-mov dx,OFFSET _"actual es mayor que 2"
+mov dx,OFFSET _actual_es_mayor_que_2
 mov ah,9
-int21h
+int 21h
 newline 1
 
 JMP etiqueta_83
@@ -231,16 +232,16 @@ JMP etiqueta_83
 
 etiqueta_78:
 fld actual
-fld 0b111010
+fld _0b111010
 fxch
 fcomp
 fstsw ax
 sahf
 JAE etiqueta_83
 
-mov dx,OFFSET _"no es mayor que 2"
+mov dx,OFFSET _no_es_mayor_que_2
 mov ah,9
-int21h
+int 21h
 newline 1
 
 

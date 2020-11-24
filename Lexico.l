@@ -4,6 +4,8 @@
 #include <math.h>
 #include <string.h>
 #include "y.tab.h"
+#include "lib\util.c"
+
 FILE *yyin;
 char *yyltext;
 
@@ -109,8 +111,15 @@ PYC     ";"
             }
 {CTE_STRING} {
             yylval.tipo_string = yytext;
+            char aux[strlen(yytext)];
+            strcpy(aux,yytext);
             validarString(yylval.tipo_string);
-            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", yylval.tipo_string, 0, 0);
+            removeChar(yylval.tipo_string,'\"');
+            removeChar(yylval.tipo_string,'!');
+            removeChar(yylval.tipo_string,':');
+            replace_char(yylval.tipo_string,'.', '_');
+            replace_char(yylval.tipo_string,' ', '_');
+            insertarEnTablaDeSimbolos(yylval.tipo_string, "CTE_STRING", aux, 0, 0);
             return CTE_STRING;
             }
 {SEP_AND}   {return SEP_AND;}

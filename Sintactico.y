@@ -136,8 +136,8 @@ put                 :           PUT CTE  			    {itoa($2,varItoa,10);
                                                          strcat(varString, varItoa);
                                                          crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 10 \n\n");}
 
-                                | PUT ID                {strcpy(varString,"_");
-                                                         strcat(varString, $2);
+                                | PUT ID                {
+                                                         strcpy(varString, $2);
                                                          crear_terceto("PUT",varString,"_");} PYC { printf("\n Regla 11 \n\n");}
 
                                 | PUT CTE_STRING        {strcpy(varString,"_");
@@ -159,6 +159,7 @@ put                 :           PUT CTE  			    {itoa($2,varItoa,10);
 get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n Regla 16\n\n");} ;
 
 maximo              :           MAXIMO P_A lista P_C { 
+                                    insertarEnTablaDeSimbolos("@aux","auxCode","",0,0);
                                     insertarEnTablaDeSimbolos(maximoString,"auxCode","",0,0);
                                     printf("\n Regla 17\n\n");
                                 };
@@ -541,11 +542,10 @@ factor: CTE {
         } 
 
         | CTE_HEXA { 
-            Find = crear_terceto($1,"_","_");
-            apilar(&pilaFactor,Find);
             strcpy(varString,"_");
             strcat(varString, $1);
-            
+            Find = crear_terceto(varString,"_","_");
+            apilar(&pilaFactor,Find);
             if(esAsig == 1) {
                 guardarAsignacion(varString);
             }
@@ -563,10 +563,10 @@ factor: CTE {
             printf("\n Regla 50\n\n");
         }
         | CTE_BIN { 
-            Find = crear_terceto($1,"_","_");
-            apilar(&pilaFactor,Find);
             strcpy(varString,"_");
             strcat(varString, $1);
+            Find = crear_terceto(varString,"_","_");
+            apilar(&pilaFactor,Find);
             if(esAsig == 1) {
                 guardarAsignacion(varString);
             }
