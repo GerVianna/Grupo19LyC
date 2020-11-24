@@ -168,7 +168,7 @@ void generarAssembler()
 
     escribir_seccion_codigo(archivo);
 
-    fprintf(archivo, "MOV EAX, 4C00h\nINT 21h\n\nEND\n");
+    fprintf(archivo, "MOV EAX, 4C00h\nINT 21h\n\nEND START\n");
 
     fclose(archivo);
 }
@@ -180,7 +180,7 @@ void escribir_seccion_datos(FILE *archivoAssembler) {
 
 	fprintf(archivoAssembler, ".DATA\n");
 
-    fprintf(archivoAssembler, "@msg db \"Ingrese un número:\", '$'\n");
+    fprintf(archivoAssembler, "@msg db \"Ingrese un numero:\", '$'\n");
 	
     t_nodo *aux;
     t_nodo *tabla = tablaSimbolos.primero;

@@ -5,7 +5,7 @@ include number.asm
 .STACK 200h
 
 .DATA
-@msg db "Ingrese un número:", '$'
+@msg db "Ingrese un numero:", '$'
 contador dd ?
 promedio dd ?
 actual dd ?
@@ -249,4 +249,4 @@ etiqueta_83:
 MOV EAX, 4C00h
 INT 21h
 
-END
+END START
