@@ -10,7 +10,7 @@ typedef struct terceto {
     char atr1[50];
     char atr2[50];
     char atr3[50];
-    char resultado_aux[10];
+    char res_aux[10];
 	int esEtiqueta;
 } terceto;
 

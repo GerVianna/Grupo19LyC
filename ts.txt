@@ -9,12 +9,22 @@ _"Ingrese un valor entero: "  CTE_STRING                    "Ingrese un valor en
 _0                            CTE                           0                             
 _2.5                          CTE_REAL                      2.5                           
 _0xA2B0                       CTE_HEXA                      0xA2B0                        
+@aux7                                                       --                            
 _9                            CTE                           9                             
 _1                            CTE                           1                             
+@aux18                                                      --                            
 _0.342                        CTE_REAL                      0.342                         
+@aux22                                                      --                            
+@aux26                                                      --                            
 _2                            CTE                           2                             
+@aux35                                                      --                            
 _4                            CTE                           4                             
 _0b110                        CTE_BIN                       0b110                         
+@max2                                                       --                            
+@max1                                                       --                            
+@aux58                                                      --                            
+@aux59                                                      --                            
+@aux63                                                      --                            
 _"La suma es: "               CTE_STRING                    "La suma es: "                14
 _0b10                         CTE_BIN                       0b10                          
 _"actual es mayor que 2"      CTE_STRING                    "actual es mayor que 2"       23

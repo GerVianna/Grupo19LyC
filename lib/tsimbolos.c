@@ -70,7 +70,8 @@ t_data* crearDatos(const char *nombre, const char *tipo, const char* valString, 
 
 
     //Es una variable
-    if(strcmp(tipo, "String")==0 || strcmp(tipo, "Integer")==0 || strcmp(tipo, "Float")==0)
+    if(strcmp(tipo, "String")==0 || strcmp(tipo, "Integer")==0 
+        || strcmp(tipo, "Float")==0 || strcmp(tipo, "auxCode") == 0)
     {
         //al nombre lo dejo aca porque no lleva 
         data->nombre = (char*)malloc(sizeof(char) * (strlen(nombre) + 1));
@@ -160,8 +161,11 @@ void guardarTablaDeSimbolos()
         {
             sprintf(linea, "%-30s%-30s%-30s%s\n", aux->data.nombre, aux->data.tipo, aux->data.valor.valor_string, "");
         }
+        else if(strcmp(aux->data.tipo, "auxCode") == 0)
+        {
+            sprintf(linea, "%-30s%-30s%-30s%s\n", aux->data.nombre, "", "--", "");
+        }
         fprintf(archivo, "%s", linea);
-        free(aux);
     }
     fclose(archivo); 
 }
@@ -193,4 +197,3 @@ t_nodo * getLexema(const char *valor){
     }
     return NULL;
 }
-

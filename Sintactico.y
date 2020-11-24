@@ -62,6 +62,15 @@ char despLista[10];
 char oper[4];
 int isOR = 0;
 
+//Auxiliar para ASM
+char auxASM[10] = "@aux";
+char indiceString[10];
+
+//Aux cantMaximos
+int cantMaximo = 0;
+char maxIndice[5];
+char maximoString[10] = "@max";
+
 //Pila
 Pila pilaExpresion;
 Pila pilaTermino;
@@ -150,6 +159,7 @@ put                 :           PUT CTE  			    {itoa($2,varItoa,10);
 get                 :           GET ID  {crear_terceto("GET",$2,"_");} PYC { printf("\n Regla 16\n\n");} ;
 
 maximo              :           MAXIMO P_A lista P_C { 
+                                    insertarEnTablaDeSimbolos(maximoString,"auxCode","",0,0);
                                     printf("\n Regla 17\n\n");
                                 };
                                 //| MAXIMO P_A lista P_C PYC { printf("\n Regla 17\n\n");};
@@ -439,7 +449,12 @@ exp:
 	exp OP_SUM term { 
         itoa(desapilar(&pilaExpresion),EindString,10);
         itoa(desapilar(&pilaTermino),TindString,10);
-        Eind=crear_terceto("+",EindString,TindString); 
+        Eind=crear_terceto("+",EindString,TindString);
+        itoa(Eind,indiceString,10);
+        strcat(auxASM,indiceString);
+        strcpy(vector_tercetos[Eind].res_aux,auxASM);
+        insertarEnTablaDeSimbolos(auxASM,"auxCode","",0,0);
+        strcpy(auxASM,"@aux");
         apilar(&pilaExpresion,Eind);
         printf("\n Regla 40\n\n");
     }
@@ -447,6 +462,11 @@ exp:
         itoa(desapilar(&pilaExpresion),EindString,10);
         itoa(desapilar(&pilaTermino),TindString,10);
         Eind=crear_terceto("-",EindString,TindString);
+        itoa(Eind,indiceString,10);
+        strcat(auxASM,indiceString);
+        strcpy(vector_tercetos[Eind].res_aux,auxASM);
+        insertarEnTablaDeSimbolos(auxASM,"auxCode","",0,0);
+        strcpy(auxASM,"@aux");
         apilar(&pilaExpresion,Eind) ;
         printf("\n Regla 41\n\n");
     }
@@ -462,6 +482,11 @@ term:
         itoa(desapilar(&pilaTermino),TindString,10);
         itoa(desapilar(&pilaFactor),FindString,10);
         Tind=crear_terceto("*",TindString,FindString);
+        itoa(Tind,indiceString,10);
+        strcat(auxASM,indiceString);
+        strcpy(vector_tercetos[Tind].res_aux,auxASM);
+        insertarEnTablaDeSimbolos(auxASM,"auxCode","",0,0);
+        strcpy(auxASM,"@aux");
         apilar(&pilaTermino,Tind) ;
         printf("\n Regla 43\n\n");
     }
@@ -469,6 +494,11 @@ term:
         itoa(desapilar(&pilaTermino),TindString,10);
         itoa(desapilar(&pilaFactor),FindString,10);
         Tind=crear_terceto("/",TindString,FindString);
+        itoa(Tind,indiceString,10);
+        strcat(auxASM,indiceString);
+        strcpy(vector_tercetos[Tind].res_aux,auxASM);
+        insertarEnTablaDeSimbolos(auxASM,"auxCode","",0,0);
+        strcpy(auxASM,"@aux");
         apilar(&pilaTermino,Tind) ;
         printf("\n Regla 44\n\n");
     }
@@ -550,7 +580,11 @@ factor: CTE {
         }
 
         | maximo { 
-            Find = crear_terceto("@max","_","_");
+            Find = crear_terceto(maximoString,"_","_");
+            cantMaximo--;
+            itoa(cantMaximo,maxIndice,10);
+            strcpy(maximoString,"@max");
+            strcat(maximoString,maxIndice);
             apilar(&pilaFactor,Find);
             printf("\n Regla 53\n\n");}
         ;
@@ -558,7 +592,11 @@ lista:
     exp
      {  int d = desapilar(&pilaExpresion);
         itoa(d,despLista,10);
-        crear_terceto(":", "@max", despLista);
+        strcpy(maximoString,"@max");
+        cantMaximo++;
+        itoa(cantMaximo,maxIndice,10);
+        strcat(maximoString,maxIndice);
+        crear_terceto(":", maximoString, despLista);
         printf("\n Regla 55\n\n");
     }
     |  
@@ -567,10 +605,10 @@ lista:
         int d = desapilar(&pilaExpresion);
         itoa(d,despLista,10);
         crear_terceto(":","@aux",despLista);
-        crear_terceto("CMP","@aux","@max");
+        crear_terceto("CMP","@aux",maximoString);
         xind = crear_terceto("JNA","_","_");
         apilar(&pilaLista,xind);
-        crear_terceto(":","@max","@aux");
+        crear_terceto(":",maximoString,"@aux");
         xind = desapilar(&pilaLista);
         char valorActual[4];
         itoa(obtenerIndiceTercetos(),valorActual,10);
@@ -624,7 +662,7 @@ int main(int argc, char *argv[]) {
         yyparse();
         guardarTablaDeSimbolos();
         escribir_tercetos();
-        preparar_assembler();
+        generarAssembler();
         escribir_tercetosAssembler();
         if (tiposDIM != variablesDIM) {
             printf("Parse failed: error en la declaracion de dim no coinciden la cantidad de VARIABLES con la cantidad de TIPOS\n");
