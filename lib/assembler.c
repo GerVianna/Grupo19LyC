@@ -179,9 +179,7 @@ void escribir_seccion_datos(FILE *archivoAssembler) {
     char buffer[10];
 
 	fprintf(archivoAssembler, ".DATA\n");
-
-    fprintf(archivoAssembler, "@msg db \"Ingrese un numero:\", '$'\n");
-	
+    	
     t_nodo *aux;
     t_nodo *tabla = tablaSimbolos.primero;
     char linea[100];
@@ -284,9 +282,6 @@ void escribir_seccion_codigo(FILE *archivoAssembler)
                 break;
                 
             case 7: //GET por consola
-                fprintf(archivoAssembler,"DisplayString @msg \n");
-                fprintf(archivoAssembler,"int 21h \n");
-                fprintf(archivoAssembler,"newLine 1\n");
                 fprintf(archivoAssembler,"GetFloat %s \n\n",vector_tercetos[i].atr2);
                 break;
 		}

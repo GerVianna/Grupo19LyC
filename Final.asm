@@ -5,7 +5,6 @@ include number.asm
 .STACK 200h
 
 .DATA
-@msg db "Ingrese un numero:", '$'
 contador dd ?
 promedio dd ?
 actual dd ?
@@ -57,9 +56,6 @@ mov ah,9
 int 21h
 newline 1
 
-DisplayString @msg 
-int 21h 
-newLine 1
 GetFloat actual 
 
 fld _0
