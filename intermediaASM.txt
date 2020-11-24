@@ -63,7 +63,7 @@
 [62] (actual,_,_)
 [63] (+,suma,actual)
 [64] (:,suma,@aux63)
-[65] (JMP,etiqueta_ET,_)
+[65] (JMP,etiqueta_11,_)
 [66] (PUT,_"La suma es: ",_)
 [67] (PUT,_suma,_)
 [68] (actual,_,_)

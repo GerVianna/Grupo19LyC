@@ -46,8 +46,6 @@ MOV AX,@DATA
 MOV DS, AX
 MOV ES, AX
 
-
-etiqueta_0:
 mov dx,OFFSET _"Prueba.txt LyC Tema 2!"
 mov ah,9
 int21h
@@ -73,7 +71,8 @@ fld @aux7
 fstp suma
 fld _0
 fstp pivot
-etiqueta_ET:
+
+etiqueta_11:
 fld contador
 fld _9
 fxch
@@ -192,7 +191,7 @@ fld @aux63
 fstp suma
 
 etiqueta_65:
-JMP etiqueta_ET
+JMP etiqueta_11
 
 
 etiqueta_66:

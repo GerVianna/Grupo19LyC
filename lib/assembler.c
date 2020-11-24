@@ -24,6 +24,11 @@ void preparar_assembler()
 	for(i=0;i<indice_terceto;i++)
 	{
 
+        if(strcmp(vector_tercetos[i].atr1,"ET")==0) {
+            printf("entre aca con i: %d\n", i);
+            vector_tercetos[i].esEtiqueta = 1;
+        }
+
 		if(strcmp(vector_tercetos[i].atr2,"_")==0 && strcmp(vector_tercetos[i].atr3,"_")==0 && vector_tercetos[i].esEtiqueta!=1 )
 		{
 			for(j=i+1;j< indice_terceto;j++)
@@ -42,11 +47,12 @@ void preparar_assembler()
 
         if(esSalto(i))
 		{	
-            //printf("Entre con i:%d\n",i);
+            printf("Entre con i:%d\n",i);
 			entero_aux = atoi(vector_tercetos[i].atr2);
-            //printf("Entero Aux:%d\n",entero_aux);
+            printf("Entero Aux:%d\n",entero_aux);
 			vector_tercetos[entero_aux].esEtiqueta = 1;
 			strcat(etiqueta,vector_tercetos[i].atr2);
+            printf("Etiqueta:%s\n",etiqueta);
 			strcpy(vector_tercetos[i].atr2,etiqueta);
 			strcpy(etiqueta,"etiqueta_");
 		}
@@ -58,8 +64,12 @@ void preparar_assembler()
 			while(strcmp(vector_tercetos[j].atr2,bufferaux1)!=0 && strcmp(vector_tercetos[j].atr3,bufferaux1)!=0)
 				j++;
 			
-			if(strcmp(vector_tercetos[j].atr2,bufferaux1)==0)
-				strcpy(vector_tercetos[j].atr2,vector_tercetos[i].atr1);
+			if(strcmp(vector_tercetos[j].atr2,bufferaux1)==0){
+                if(strcmp(vector_tercetos[i].atr1,"ET")!=0)
+				    strcpy(vector_tercetos[j].atr2,vector_tercetos[i].atr1);
+                else
+                    strcpy(vector_tercetos[j].atr2,bufferaux1);
+            }
 			else
 				strcpy(vector_tercetos[j].atr3,vector_tercetos[i].atr1);
 			
@@ -105,8 +115,6 @@ int esOperacion(int indice)
 		return 6;											
 	if(strcmp(vector_tercetos[indice].atr1,"GET")==0)
 		return 7;
-    if(strcmp(vector_tercetos[indice].atr1,"ET")==0)
-        return 8;
 	
 	return 0;
 }
@@ -262,9 +270,6 @@ void escribir_seccion_codigo(FILE *archivoAssembler)
                 fprintf(archivoAssembler,"int 21h \n");
                 fprintf(archivoAssembler,"newLine 1\n");
                 fprintf(archivoAssembler,"GetFloat %s \n\n",vector_tercetos[i].atr2);
-                break;
-            case 8: //ET
-                fprintf(archivoAssembler,"etiqueta_ET:\n");
                 break;
 		}
 		
